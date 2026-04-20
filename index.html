@@ -738,6 +738,32 @@ body {
   font-size: 11.5px; color: #334155; line-height: 1.45;
 }
 .red-assign-banner svg { flex-shrink: 0; margin-top: 1px; }
+
+/* ─── Loading spinner on buttons ────────────── */
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+.btn-spin { animation: btn-spin .65s linear infinite; display: inline-block; }
+
+/* ─── Toast notification ─────────────────────── */
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: #0F172A; color: #fff;
+  padding: 11px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 9px;
+  z-index: 9999; pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.22);
+  animation: toastIn .18s cubic-bezier(.22,1,.36,1);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)  scale(1);    }
+}
+.toast.toast-out {
+  animation: toastOut .16s ease forwards;
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(6px); }
+}
 </style>
 </head>
 <body>
@@ -1583,7 +1609,7 @@ function renderAction(item) {
 
   // Primary button — assignMode items trigger edit mode directly
   const btnClass = a.assignMode ? 'btn-confirm btn-assign' : 'btn-confirm';
-  const btnClick = a.assignMode ? 'onclick="enterEditMode()"' : 'onclick="confirmMapping()"';
+  const btnClick = a.assignMode ? 'onclick="enterEditMode()"' : 'onclick="triggerConfirmMapping()"';
   const btnIcon  = a.assignMode
     ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`
     : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -1791,17 +1817,26 @@ function enterEditMode() {
   renderAction(ITEMS[currentKey]);
 }
 
-/* Save Mapping — capture edit state and move directly to GREEN (no review step per PRD) */
+/* Save Mapping — show loading state, then move directly to GREEN after 1 s */
 function saveMapping() {
   savedSelections = editSelections.map(s => ({ ...s }));
   savedDefaultId  = editDefaultId;
-
   editMode       = false;
   editSelections = [];
   editDefaultId  = null;
 
-  // PRD: "Save Mapping → Move item to GREEN → Exit override mode"
-  confirmMapping();
+  // Loading state on the Save / Confirm Assignment button
+  const btn = document.getElementById('edit-save-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = spinnerSVG() + ' Saving\u2026';
+  }
+
+  // PRD: wait 1 s, then move to GREEN and show toast
+  setTimeout(() => {
+    confirmMapping();
+    showToast('Mapping confirmed');
+  }, 1000);
 }
 
 /* Cancel edit — discard, return to previous state */
@@ -1980,6 +2015,69 @@ function rejectToRed() {
 /* Reject from review mode (legacy shim — delegates to rejectToRed) */
 function rejectFromReview() {
   rejectToRed();
+}
+
+/* ─────────────────────────────────────────────────
+   TOAST + LOADING-STATE HELPERS
+───────────────────────────────────────────────── */
+
+/* Show a floating success toast — auto-dismisses after 2.5 s */
+function showToast(msg) {
+  const old = document.getElementById('app-toast');
+  if (old) { clearTimeout(old._t); old.remove(); }
+
+  const el = document.createElement('div');
+  el.id = 'app-toast';
+  el.className = 'toast';
+  el.innerHTML = `
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    ${msg}`;
+  document.body.appendChild(el);
+
+  el._t = setTimeout(() => {
+    el.classList.add('toast-out');
+    setTimeout(() => el.remove(), 180);
+  }, 2500);
+}
+
+/* Shared spinner HTML — reused in all loading buttons */
+function spinnerSVG() {
+  return `<svg class="btn-spin" width="13" height="13" viewBox="0 0 24 24"
+              fill="none" stroke="white" stroke-width="2.5">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>`;
+}
+
+/* Confirm Mapping with loading state:
+   1. Disable button + show "Saving…"
+   2. Wait 1 s
+   3. Run confirmMapping() — moves item to Green, auto-selects next
+   4. Show success toast */
+function triggerConfirmMapping() {
+  const btn = document.querySelector('#action-body .btn-confirm');
+  if (btn && !btn.disabled) {
+    btn.disabled = true;
+    btn.innerHTML = spinnerSVG() + ' Saving\u2026';
+  }
+  setTimeout(() => {
+    confirmMapping();
+    showToast('Mapping confirmed');
+  }, 1000);
+}
+
+/* Keep Current (Blue queue) with same loading UX */
+function triggerKeepCurrentAPL() {
+  const btn = document.querySelector('#action-body .btn-confirm');
+  if (btn && !btn.disabled) {
+    btn.disabled = true;
+    btn.innerHTML = spinnerSVG() + ' Saving\u2026';
+  }
+  setTimeout(() => {
+    keepCurrentAPL();
+    showToast('Mapping confirmed — existing supplier kept');
+  }, 1000);
 }
 
 /* Toggle an APL option.
@@ -2441,7 +2539,7 @@ function buildReviewActionBody(item) {
 
     <div class="action-btns">
       <div class="btn-wrap">
-        <button class="btn-confirm" onclick="confirmMapping()">
+        <button class="btn-confirm" onclick="triggerConfirmMapping()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
@@ -2780,7 +2878,7 @@ function buildBlueActionBody(item) {
 
     <div class="action-btns">
       <div class="btn-wrap">
-        <button class="btn-confirm" onclick="keepCurrentAPL()">
+        <button class="btn-confirm" onclick="triggerKeepCurrentAPL()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
             <polyline points="20 6 9 17 4 12"/>
           </svg>

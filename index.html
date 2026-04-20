@@ -739,6 +739,241 @@ body {
 }
 .red-assign-banner svg { flex-shrink: 0; margin-top: 1px; }
 
+/* ─── Dashboard view ────────────────────────── */
+#dashboard-view {
+  flex: 1; overflow-y: auto;
+  background: #fff;
+  padding: 36px 44px;
+  display: flex; flex-direction: column; align-items: stretch;
+}
+#queue-view { flex: 1; overflow: hidden; display: flex; }
+
+.db-wrap { width: 100%; }
+
+/* 2-column body grid */
+.db-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.db-col-left  { min-width: 0; }
+.db-col-right { min-width: 0; }
+
+/* Right-panel base card */
+.db-rp-card {
+  background: #FAFAFA;
+  border: 1px solid #F1F5F9;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.db-rp-card:last-child { margin-bottom: 0; }
+.db-rp-title {
+  font-size: 9.5px; font-weight: 700; color: #CBD5E1;
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 14px;
+}
+
+/* Quick Stats — 3-col inside right card */
+.db-qs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.db-qs-item {
+  text-align: center; padding: 12px 6px;
+  background: #fff; border: 1px solid #F1F5F9; border-radius: 9px;
+}
+.db-qs-num {
+  font-size: 22px; font-weight: 700; color: #0F172A;
+  letter-spacing: -.5px; line-height: 1; margin-bottom: 5px;
+}
+.db-qs-lbl { font-size: 10px; color: #94A3B8; line-height: 1.3; }
+
+/* Recent Activity */
+.db-act-list { display: flex; flex-direction: column; }
+.db-act-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid #F1F5F9;
+}
+.db-act-row:last-child { border-bottom: none; padding-bottom: 0; }
+.db-act-icon {
+  width: 26px; height: 26px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  font-size: 11px;
+}
+.db-act-icon-green { background: #ECFDF5; }
+.db-act-icon-blue  { background: #EFF6FF; }
+.db-act-icon-amber { background: #FFFBEB; }
+.db-act-body { flex: 1; min-width: 0; }
+.db-act-text { font-size: 12px; color: #334155; line-height: 1.45; }
+.db-act-meta { font-size: 10.5px; color: #94A3B8; margin-top: 2px; }
+
+/* Attention Needed */
+.db-attn-empty { font-size: 12px; color: #94A3B8; text-align: center; padding: 8px 0; }
+.db-attn-list  { display: flex; flex-direction: column; gap: 7px; }
+.db-attn-row {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px;
+  background: #fff; border: 1px solid #FECACA;
+  border-radius: 9px; cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.db-attn-row:hover { border-color: #EF4444; background: #FFF5F5; }
+.db-attn-dot { width: 6px; height: 6px; border-radius: 50%; background: #EF4444; flex-shrink: 0; }
+.db-attn-body { flex: 1; min-width: 0; }
+.db-attn-name { font-size: 12px; font-weight: 500; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.db-attn-sub  { font-size: 10.5px; color: #94A3B8; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.db-attn-arr  { font-size: 13px; color: #FECACA; flex-shrink: 0; }
+.db-attn-row:hover .db-attn-arr { color: #EF4444; }
+
+/* Header */
+.db-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+}
+.db-header-left {}
+.db-title { font-size: 18px; font-weight: 700; color: #0F172A; letter-spacing: -.3px; }
+.db-date  { font-size: 11.5px; color: #94A3B8; margin-top: 2px; }
+.db-header-cta {
+  padding: 9px 18px;
+  background: #0F172A; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: background .13s; letter-spacing: -.1px; flex-shrink: 0;
+}
+.db-header-cta:hover { background: #1E293B; }
+
+/* Section rhythm */
+.db-section { margin-bottom: 28px; }
+.db-section-label {
+  font-size: 9.5px; font-weight: 700; color: #CBD5E1;
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px;
+}
+
+/* Base card */
+.db-card {
+  background: #fff; border: 1px solid #F1F5F9;
+  border-radius: 12px; padding: 20px 22px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+/* ── Queue grid ── */
+.db-queue-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+}
+.db-q-card {
+  border-radius: 12px; padding: 18px 16px 15px;
+  position: relative; cursor: pointer;
+  transition: box-shadow .15s, border-color .15s, transform .12s;
+  border: 1px solid transparent;
+}
+.db-q-card:hover { transform: translateY(-2px); }
+
+/* Tinted backgrounds + colored borders */
+.db-q-amber { background: #FFFBEB; border-color: #FDE68A; }
+.db-q-amber:hover { border-color: #F59E0B; box-shadow: 0 4px 12px rgba(245,158,11,.12); }
+.db-q-red   { background: #FFF5F5; border-color: #FECACA; }
+.db-q-red:hover   { border-color: #EF4444; box-shadow: 0 4px 12px rgba(239,68,68,.10); }
+.db-q-blue  { background: #EFF6FF; border-color: #BFDBFE; }
+.db-q-blue:hover  { border-color: #3B82F6; box-shadow: 0 4px 12px rgba(59,130,246,.10); }
+.db-q-green { background: #F0FDF4; border-color: #BBF7D0; }
+.db-q-green:hover { border-color: #10B981; box-shadow: 0 4px 12px rgba(16,185,129,.10); }
+
+/* Queue card content */
+.db-q-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.db-q-num  { font-size: 30px; font-weight: 700; letter-spacing: -.8px; line-height: 1; }
+.db-q-amber .db-q-num { color: #92400E; }
+.db-q-red   .db-q-num { color: #991B1B; }
+.db-q-blue  .db-q-num { color: #1D4ED8; }
+.db-q-green .db-q-num { color: #065F46; }
+.db-q-arrow { font-size: 14px; color: #CBD5E1; line-height: 1; margin-top: 2px; }
+.db-q-name { font-size: 12.5px; font-weight: 600; color: #334155; margin-bottom: 3px; }
+.db-q-hint { font-size: 10.5px; color: #94A3B8; line-height: 1.4; }
+
+/* ── Progress card ── */
+.db-prog-main {
+  display: flex; align-items: center; gap: 20px; margin-bottom: 14px;
+}
+.db-prog-left { flex: 1; }
+.db-pct { font-size: 22px; font-weight: 700; color: #0F172A; letter-spacing: -.4px; line-height: 1; }
+.db-pct-sub { font-size: 12.5px; color: #94A3B8; margin-left: 6px; }
+.db-prog-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.db-prog-pending { font-size: 12px; color: #64748B; }
+.db-prog-link {
+  font-size: 12px; color: #3B82F6; font-weight: 500; cursor: pointer;
+  background: none; border: none; padding: 0; display: flex; align-items: center; gap: 3px;
+}
+.db-prog-link:hover { color: #2563EB; }
+.db-prog-track {
+  height: 6px; background: #F1F5F9; border-radius: 4px; overflow: hidden;
+}
+.db-prog-fill {
+  height: 100%; background: #0F172A; border-radius: 4px;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Today's Updates ── */
+.db-updates-list { display: flex; flex-direction: column; gap: 7px; }
+.db-update-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 14px;
+  background: #FAFAFA; border: 1px solid #F1F5F9; border-radius: 9px;
+}
+.db-update-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.db-dot-added { background: #60A5FA; }
+.db-dot-green { background: #34D399; }
+.db-dot-warn  { background: #FBBF24; }
+.db-update-text { font-size: 12.5px; color: #334155; flex: 1; }
+.db-update-time { font-size: 11px; color: #CBD5E1; }
+
+/* ── Workload (single card, inline rows) ── */
+.db-wl-card { overflow: hidden; }
+.db-wl-rows {}
+.db-wl-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 22px;
+}
+.db-wl-row + .db-wl-row { border-top: 1px solid #F8FAFC; }
+.db-wl-info { flex: 1; min-width: 0; }
+.db-wl-name { font-size: 12.5px; font-weight: 600; color: #0F172A; margin-bottom: 1px; }
+.db-wl-desc { font-size: 11px; color: #94A3B8; }
+.db-wl-right { text-align: right; flex-shrink: 0; }
+.db-wl-stat { font-size: 12px; color: #64748B; margin-bottom: 7px; white-space: nowrap; }
+.db-wl-stat strong { color: #0F172A; font-weight: 600; }
+.db-mini-wrap { width: 100px; }
+.db-mini-track { height: 4px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
+.db-mini-fill  { height: 100%; background: #94A3B8; border-radius: 3px; transition: width .5s; }
+
+/* ── Target ── */
+.db-target-inner {
+  display: flex; gap: 0; align-items: stretch;
+}
+.db-target-col { flex: 1; padding: 4px 0; }
+.db-target-col + .db-target-col { padding-left: 28px; border-left: 1px solid #F1F5F9; margin-left: 28px; }
+.db-target-lbl {
+  font-size: 9.5px; font-weight: 700; color: #CBD5E1;
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px;
+}
+.db-target-val { font-size: 16px; font-weight: 700; color: #0F172A; letter-spacing: -.2px; }
+.db-days-num   { font-size: 28px; font-weight: 700; color: #0F172A; letter-spacing: -.6px; line-height: 1; }
+.db-days-lbl   { font-size: 11.5px; color: #64748B; margin-top: 4px; }
+.db-days-urgency { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 20px; font-size: 10.5px; font-weight: 600; }
+.db-days-ok   { background: #ECFDF5; color: #065F46; }
+.db-days-warn { background: #FFF7ED; color: #92400E; }
+.db-days-over { background: #FFF5F5; color: #991B1B; }
+
+/* ── Bottom CTA ── */
+.db-cta {
+  width: 100%; padding: 13px 20px;
+  background: #0F172A; color: #fff;
+  border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .14s; letter-spacing: -.1px;
+}
+.db-cta:hover { background: #1E293B; }
+
 /* ─── Loading spinner on buttons ────────────── */
 @keyframes btn-spin { to { transform: rotate(360deg); } }
 .btn-spin { animation: btn-spin .65s linear infinite; display: inline-block; }
@@ -778,7 +1013,7 @@ body {
     <div class="brand-sub">MOG · APL Mapper .v1</div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-item">
+    <div class="nav-item active" id="nav-dashboard" onclick="showDashboard()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <rect x="3" y="3" width="7" height="7" rx="1.5"/>
         <rect x="14" y="3" width="7" height="7" rx="1.5"/>
@@ -787,7 +1022,7 @@ body {
       </svg>
       Dashboard
     </div>
-    <div class="nav-item active">
+    <div class="nav-item" id="nav-worklist" onclick="showWorklist()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <line x1="9" y1="6" x2="20" y2="6"/>
         <line x1="9" y1="12" x2="20" y2="12"/>
@@ -800,6 +1035,12 @@ body {
     </div>
   </nav>
 </div>
+
+<!-- ═══ Dashboard View ══════════════════════════════ -->
+<div id="dashboard-view"></div>
+
+<!-- ═══ Queue View ═══════════════════════════════════ -->
+<div id="queue-view" style="display:none">
 
 <!-- ═══ Queue Panel ════════════════════════════════ -->
 <div class="queue-panel">
@@ -893,6 +1134,8 @@ body {
   </div>
   <div class="panel-body" id="action-body"></div>
 </div>
+
+</div><!-- /#queue-view -->
 
 <!-- ═══════════════════════════════════════════════
      DATA + LOGIC
@@ -2975,6 +3218,230 @@ function switchPanelTab(el) {
 }
 
 /* ─────────────────────────────────────────────────
+   DASHBOARD — constants & helpers
+───────────────────────────────────────────────── */
+const WORKLOAD_CONFIG = {
+  original:    {
+    label: 'Original Batch',
+    desc:  'Initial MOG review assignment',
+    keys:  ['active-dry-yeast','baking-soda','brown-sugar','herbal-tea','coconut-flour',
+            'almond-butter','rock-salt','white-pepper','cane-sugar','tapioca-starch']
+  },
+  incremental: {
+    label: 'Incremental Batch',
+    desc:  'Items added after initial assignment',
+    keys:  ['soy-lecithin','xanthan-gum','refined-flour','sunflower-oil','dried-ginger']
+  }
+};
+const TARGET_DATE_STR = '30 April 2026';
+const TARGET_DATE_OBJ = new Date('2026-04-30');
+const TODAY_OBJ       = new Date('2026-04-20');
+
+function showDashboard() {
+  renderDashboard();
+  document.getElementById('dashboard-view').style.display = 'flex';
+  document.getElementById('queue-view').style.display     = 'none';
+  document.getElementById('nav-dashboard').classList.add('active');
+  document.getElementById('nav-worklist').classList.remove('active');
+}
+
+function showWorklist() {
+  document.getElementById('dashboard-view').style.display = 'none';
+  document.getElementById('queue-view').style.display     = 'flex';
+  document.getElementById('nav-worklist').classList.add('active');
+  document.getElementById('nav-dashboard').classList.remove('active');
+}
+
+function renderDashboard() {
+  const all    = Object.values(ITEMS);
+  const total  = all.length;
+  const green  = all.filter(i => i.queue === 'green').length;
+  const amber  = all.filter(i => i.queue === 'amber').length;
+  const red    = all.filter(i => i.queue === 'red').length;
+  const blue   = all.filter(i => i.queue === 'blue').length;
+  const pending = amber + red + blue;
+  const pct    = total > 0 ? Math.round((green / total) * 100) : 0;
+
+  const msLeft   = TARGET_DATE_OBJ - TODAY_OBJ;
+  const daysLeft = Math.max(0, Math.round(msLeft / (1000 * 60 * 60 * 24)));
+  const urgencyClass = daysLeft > 7 ? 'db-days-ok' : daysLeft > 3 ? 'db-days-warn' : 'db-days-over';
+  const urgencyLabel = daysLeft > 7 ? 'On track' : daysLeft > 3 ? 'Due soon' : 'Overdue';
+
+  // Per-batch stats
+  function batchStats(cfg) {
+    const items = cfg.keys.map(k => ITEMS[k]).filter(Boolean);
+    const done  = items.filter(i => i.queue === 'green').length;
+    return { total: items.length, done, pct: items.length ? Math.round((done / items.length) * 100) : 0 };
+  }
+  const origStats = batchStats(WORKLOAD_CONFIG.original);
+  const incrStats = batchStats(WORKLOAD_CONFIG.incremental);
+
+  // Date string
+  const todayStr = TODAY_OBJ.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  // Today's Updates — derived from current state
+  const updates = [
+    { dot: 'db-dot-added', text: `${incrStats.total} items added in the Incremental Batch`, time: 'Today' },
+    { dot: 'db-dot-green', text: `${green} item${green !== 1 ? 's' : ''} moved to Green — confirmed`, time: 'Today' },
+    { dot: 'db-dot-warn',  text: `${red} item${red !== 1 ? 's' : ''} need${red === 1 ? 's' : ''} manual mapping`, time: 'Today' },
+  ];
+
+  document.getElementById('dashboard-view').innerHTML = `
+<div class="db-wrap">
+
+  <!-- ── Header ── -->
+  <div class="db-header">
+    <div class="db-header-left">
+      <div class="db-title">Where things stand</div>
+      <div class="db-date">${todayStr}</div>
+    </div>
+    <button class="db-header-cta" onclick="showWorklist()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+        <line x1="9" y1="6" x2="20" y2="6"/>
+        <line x1="9" y1="12" x2="20" y2="12"/>
+        <line x1="9" y1="18" x2="20" y2="18"/>
+        <circle cx="4" cy="6"  r="1.5" fill="currentColor" stroke="none"/>
+        <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+        <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
+      </svg>
+      Start Reviewing
+    </button>
+  </div>
+
+  <!-- ── Section 1: Queue Summary (primary focus) ── -->
+  <div class="db-section" style="width:100%">
+    <div class="db-section-label">Queue Summary</div>
+    <div class="db-queue-grid">
+      <div class="db-q-card db-q-amber" onclick="showWorklist();filterQueue('amber')" title="Go to Amber queue">
+        <div class="db-q-top">
+          <div class="db-q-num">${amber}</div>
+          <span class="db-q-arrow">›</span>
+        </div>
+        <div class="db-q-name">Amber</div>
+        <div class="db-q-hint">Needs review</div>
+      </div>
+      <div class="db-q-card db-q-red" onclick="showWorklist();filterQueue('red')" title="Go to Red queue">
+        <div class="db-q-top">
+          <div class="db-q-num">${red}</div>
+          <span class="db-q-arrow">›</span>
+        </div>
+        <div class="db-q-name">Red</div>
+        <div class="db-q-hint">Needs mapping</div>
+      </div>
+      <div class="db-q-card db-q-blue" onclick="showWorklist();filterQueue('blue')" title="Go to Blue queue">
+        <div class="db-q-top">
+          <div class="db-q-num">${blue}</div>
+          <span class="db-q-arrow">›</span>
+        </div>
+        <div class="db-q-name">Blue</div>
+        <div class="db-q-hint">Transition required</div>
+      </div>
+      <div class="db-q-card db-q-green" onclick="showWorklist();filterQueue('green')" title="Go to Green queue">
+        <div class="db-q-top">
+          <div class="db-q-num">${green}</div>
+          <span class="db-q-arrow">›</span>
+        </div>
+        <div class="db-q-name">Green</div>
+        <div class="db-q-hint">Completed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: Overall Progress ── -->
+  <div class="db-section" style="width:100%">
+    <div class="db-section-label">Overall Progress</div>
+    <div class="db-card" style="cursor:pointer" onclick="showWorklist();filterQueue('amber')" title="View pending items">
+      <div class="db-prog-main">
+        <div class="db-prog-left">
+          <div>
+            <span class="db-pct">${pct}%</span><span class="db-pct-sub">complete</span>
+          </div>
+          <div class="db-prog-meta">
+            <span class="db-prog-pending">${pending} item${pending !== 1 ? 's' : ''} pending review</span>
+            <button class="db-prog-link" onclick="event.stopPropagation();showWorklist();filterQueue('amber')">
+              View pending &rsaquo;
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="db-prog-track">
+        <div class="db-prog-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 3: Today's Updates ── -->
+  <div class="db-section" style="width:100%">
+    <div class="db-section-label">Today's Updates</div>
+    <div class="db-updates-list">
+      ${updates.map(u => `
+      <div class="db-update-row">
+        <span class="db-update-dot ${u.dot}"></span>
+        <span class="db-update-text">${u.text}</span>
+        <span class="db-update-time">${u.time}</span>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- ── Section 4: Workload ── -->
+  <div class="db-section" style="width:100%">
+    <div class="db-section-label">Workload</div>
+    <div class="db-card db-wl-card" style="padding:0">
+      <div class="db-wl-rows">
+        ${[
+          { label: 'Initial Assignment',  desc: 'Original MOG review items',       s: origStats },
+          { label: 'Newly Added Items',   desc: 'Incremental items added later',    s: incrStats }
+        ].map(r => `
+        <div class="db-wl-row">
+          <div class="db-wl-info">
+            <div class="db-wl-name">${r.label}</div>
+            <div class="db-wl-desc">${r.desc}</div>
+          </div>
+          <div class="db-wl-right">
+            <div class="db-wl-stat"><strong>${r.s.done}</strong> / ${r.s.total} done</div>
+            <div class="db-mini-wrap">
+              <div class="db-mini-track"><div class="db-mini-fill" style="width:${r.s.pct}%"></div></div>
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 5: Target Date ── -->
+  <div class="db-section" style="width:100%">
+    <div class="db-section-label">Target Date</div>
+    <div class="db-card">
+      <div class="db-target-inner">
+        <div class="db-target-col">
+          <div class="db-target-lbl">Deadline</div>
+          <div class="db-target-val">${TARGET_DATE_STR}</div>
+        </div>
+        <div class="db-target-col">
+          <div class="db-days-num">${daysLeft}</div>
+          <div class="db-days-lbl">days remaining</div>
+          <span class="db-days-urgency ${urgencyClass}">${urgencyLabel}</span>
+        </div>
+        <div class="db-target-col">
+          <div class="db-target-lbl">Still to review</div>
+          <div class="db-target-val">${pending} items</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom CTA ── -->
+  <div style="width:100%;margin-top:4px;margin-bottom:40px">
+    <button class="db-cta" onclick="showWorklist()">
+      Start Reviewing — ${pending} items remaining
+    </button>
+  </div>
+
+</div>
+  `;
+}
+
+/* ─────────────────────────────────────────────────
    INITIALISE
 ───────────────────────────────────────────────── */
 function init() {
@@ -2990,7 +3457,7 @@ function init() {
     list.insertBefore(row, empty);
   });
 
-  // Auto-select first amber item
+  // Auto-select first amber item (pre-load detail for when worklist opens)
   const firstAmber = list.querySelector('.q-item[data-queue="amber"]');
   if (firstAmber) {
     firstAmber.classList.add('selected');
@@ -2999,6 +3466,9 @@ function init() {
     renderDetail(ITEMS[key]);
     renderAction(ITEMS[key]);
   }
+
+  // Landing page: Dashboard
+  showDashboard();
 }
 
 init();

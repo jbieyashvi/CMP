@@ -3286,10 +3286,16 @@ function renderDashboard() {
     { dot: 'db-dot-warn',  text: `${red} item${red !== 1 ? 's' : ''} need${red === 1 ? 's' : ''} manual mapping`, time: 'Today' },
   ];
 
+  // Red items for Attention Needed panel
+  const redItems = all.filter(i => i.queue === 'red');
+
+  // Green items for Recent Activity
+  const greenItems = all.filter(i => i.queue === 'green');
+
   document.getElementById('dashboard-view').innerHTML = `
 <div class="db-wrap">
 
-  <!-- ── Header ── -->
+  <!-- ── Header (full width) ── -->
   <div class="db-header">
     <div class="db-header-left">
       <div class="db-title">Where things stand</div>
@@ -3308,136 +3314,208 @@ function renderDashboard() {
     </button>
   </div>
 
-  <!-- ── Section 1: Queue Summary (primary focus) ── -->
-  <div class="db-section" style="width:100%">
-    <div class="db-section-label">Queue Summary</div>
-    <div class="db-queue-grid">
-      <div class="db-q-card db-q-amber" onclick="showWorklist();filterQueue('amber')" title="Go to Amber queue">
-        <div class="db-q-top">
-          <div class="db-q-num">${amber}</div>
-          <span class="db-q-arrow">›</span>
-        </div>
-        <div class="db-q-name">Amber</div>
-        <div class="db-q-hint">Needs review</div>
-      </div>
-      <div class="db-q-card db-q-red" onclick="showWorklist();filterQueue('red')" title="Go to Red queue">
-        <div class="db-q-top">
-          <div class="db-q-num">${red}</div>
-          <span class="db-q-arrow">›</span>
-        </div>
-        <div class="db-q-name">Red</div>
-        <div class="db-q-hint">Needs mapping</div>
-      </div>
-      <div class="db-q-card db-q-blue" onclick="showWorklist();filterQueue('blue')" title="Go to Blue queue">
-        <div class="db-q-top">
-          <div class="db-q-num">${blue}</div>
-          <span class="db-q-arrow">›</span>
-        </div>
-        <div class="db-q-name">Blue</div>
-        <div class="db-q-hint">Transition required</div>
-      </div>
-      <div class="db-q-card db-q-green" onclick="showWorklist();filterQueue('green')" title="Go to Green queue">
-        <div class="db-q-top">
-          <div class="db-q-num">${green}</div>
-          <span class="db-q-arrow">›</span>
-        </div>
-        <div class="db-q-name">Green</div>
-        <div class="db-q-hint">Completed</div>
-      </div>
-    </div>
-  </div>
+  <!-- ── 2-Column Body ── -->
+  <div class="db-layout">
 
-  <!-- ── Section 2: Overall Progress ── -->
-  <div class="db-section" style="width:100%">
-    <div class="db-section-label">Overall Progress</div>
-    <div class="db-card" style="cursor:pointer" onclick="showWorklist();filterQueue('amber')" title="View pending items">
-      <div class="db-prog-main">
-        <div class="db-prog-left">
+    <!-- ════ LEFT COLUMN ════ -->
+    <div class="db-col-left">
+
+      <!-- Queue Summary -->
+      <div class="db-section">
+        <div class="db-section-label">Queue Summary</div>
+        <div class="db-queue-grid">
+          <div class="db-q-card db-q-amber" onclick="showWorklist();filterQueue('amber')">
+            <div class="db-q-top"><div class="db-q-num">${amber}</div><span class="db-q-arrow">›</span></div>
+            <div class="db-q-name">Amber</div>
+            <div class="db-q-hint">Needs review</div>
+          </div>
+          <div class="db-q-card db-q-red" onclick="showWorklist();filterQueue('red')">
+            <div class="db-q-top"><div class="db-q-num">${red}</div><span class="db-q-arrow">›</span></div>
+            <div class="db-q-name">Red</div>
+            <div class="db-q-hint">Needs mapping</div>
+          </div>
+          <div class="db-q-card db-q-blue" onclick="showWorklist();filterQueue('blue')">
+            <div class="db-q-top"><div class="db-q-num">${blue}</div><span class="db-q-arrow">›</span></div>
+            <div class="db-q-name">Blue</div>
+            <div class="db-q-hint">Transition required</div>
+          </div>
+          <div class="db-q-card db-q-green" onclick="showWorklist();filterQueue('green')">
+            <div class="db-q-top"><div class="db-q-num">${green}</div><span class="db-q-arrow">›</span></div>
+            <div class="db-q-name">Green</div>
+            <div class="db-q-hint">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall Progress -->
+      <div class="db-section">
+        <div class="db-section-label">Overall Progress</div>
+        <div class="db-card" style="cursor:pointer" onclick="showWorklist();filterQueue('amber')">
           <div>
             <span class="db-pct">${pct}%</span><span class="db-pct-sub">complete</span>
           </div>
-          <div class="db-prog-meta">
+          <div class="db-prog-meta" style="margin-top:6px;margin-bottom:12px">
             <span class="db-prog-pending">${pending} item${pending !== 1 ? 's' : ''} pending review</span>
-            <button class="db-prog-link" onclick="event.stopPropagation();showWorklist();filterQueue('amber')">
-              View pending &rsaquo;
-            </button>
+            <button class="db-prog-link" onclick="event.stopPropagation();showWorklist();filterQueue('amber')">View pending ›</button>
+          </div>
+          <div class="db-prog-track">
+            <div class="db-prog-fill" style="width:${pct}%"></div>
           </div>
         </div>
       </div>
-      <div class="db-prog-track">
-        <div class="db-prog-fill" style="width:${pct}%"></div>
+
+      <!-- Today's Updates -->
+      <div class="db-section">
+        <div class="db-section-label">Today's Updates</div>
+        <div class="db-updates-list">
+          ${updates.map(u => `
+          <div class="db-update-row">
+            <span class="db-update-dot ${u.dot}"></span>
+            <span class="db-update-text">${u.text}</span>
+            <span class="db-update-time">${u.time}</span>
+          </div>`).join('')}
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ── Section 3: Today's Updates ── -->
-  <div class="db-section" style="width:100%">
-    <div class="db-section-label">Today's Updates</div>
-    <div class="db-updates-list">
-      ${updates.map(u => `
-      <div class="db-update-row">
-        <span class="db-update-dot ${u.dot}"></span>
-        <span class="db-update-text">${u.text}</span>
-        <span class="db-update-time">${u.time}</span>
-      </div>`).join('')}
-    </div>
-  </div>
+      <!-- Workload -->
+      <div class="db-section">
+        <div class="db-section-label">Workload</div>
+        <div class="db-card db-wl-card" style="padding:0">
+          ${[
+            { label:'Initial Assignment', desc:'Original MOG review items',    s: origStats },
+            { label:'Newly Added Items',  desc:'Incremental items added later', s: incrStats }
+          ].map(r => `
+          <div class="db-wl-row">
+            <div class="db-wl-info">
+              <div class="db-wl-name">${r.label}</div>
+              <div class="db-wl-desc">${r.desc}</div>
+            </div>
+            <div class="db-wl-right">
+              <div class="db-wl-stat"><strong>${r.s.done}</strong> / ${r.s.total} done</div>
+              <div class="db-mini-wrap">
+                <div class="db-mini-track"><div class="db-mini-fill" style="width:${r.s.pct}%"></div></div>
+              </div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
 
-  <!-- ── Section 4: Workload ── -->
-  <div class="db-section" style="width:100%">
-    <div class="db-section-label">Workload</div>
-    <div class="db-card db-wl-card" style="padding:0">
-      <div class="db-wl-rows">
-        ${[
-          { label: 'Initial Assignment',  desc: 'Original MOG review items',       s: origStats },
-          { label: 'Newly Added Items',   desc: 'Incremental items added later',    s: incrStats }
-        ].map(r => `
-        <div class="db-wl-row">
-          <div class="db-wl-info">
-            <div class="db-wl-name">${r.label}</div>
-            <div class="db-wl-desc">${r.desc}</div>
+      <!-- Bottom CTA -->
+      <div style="margin-bottom:40px">
+        <button class="db-cta" onclick="showWorklist()">
+          Start Reviewing — ${pending} items remaining
+        </button>
+      </div>
+
+    </div><!-- /col-left -->
+
+    <!-- ════ RIGHT COLUMN ════ -->
+    <div class="db-col-right">
+
+      <!-- Quick Stats -->
+      <div class="db-rp-card">
+        <div class="db-rp-title">Quick Stats</div>
+        <div class="db-qs-grid">
+          <div class="db-qs-item">
+            <div class="db-qs-num">${total}</div>
+            <div class="db-qs-lbl">Total Items</div>
           </div>
-          <div class="db-wl-right">
-            <div class="db-wl-stat"><strong>${r.s.done}</strong> / ${r.s.total} done</div>
-            <div class="db-mini-wrap">
-              <div class="db-mini-track"><div class="db-mini-fill" style="width:${r.s.pct}%"></div></div>
+          <div class="db-qs-item">
+            <div class="db-qs-num" style="color:#C2410C">${pending}</div>
+            <div class="db-qs-lbl">Pending</div>
+          </div>
+          <div class="db-qs-item">
+            <div class="db-qs-num" style="color:#065F46">${green}</div>
+            <div class="db-qs-lbl">Completed</div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#94A3B8;margin-bottom:5px">
+            <span>Completion</span><span style="color:#0F172A;font-weight:600">${pct}%</span>
+          </div>
+          <div class="db-prog-track" style="height:5px">
+            <div class="db-prog-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap">
+          <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#FFFBEB;color:#92400E;border:1px solid #FDE68A">Amber ${amber}</span>
+          <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#FFF5F5;color:#991B1B;border:1px solid #FECACA">Red ${red}</span>
+          <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE">Blue ${blue}</span>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="db-rp-card">
+        <div class="db-rp-title">Recent Activity</div>
+        <div class="db-act-list">
+          ${greenItems.slice(0, 3).map(item => `
+          <div class="db-act-row">
+            <div class="db-act-icon db-act-icon-green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="db-act-body">
+              <div class="db-act-text">${item.name} mapped</div>
+              <div class="db-act-meta">${item.site}</div>
+            </div>
+          </div>`).join('')}
+          ${greenItems.length === 0 ? `<div style="font-size:12px;color:#94A3B8;padding:6px 0">No activity yet</div>` : ''}
+          <div class="db-act-row">
+            <div class="db-act-icon db-act-icon-blue">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="db-act-body">
+              <div class="db-act-text">${incrStats.total} items added to queue</div>
+              <div class="db-act-meta">Incremental batch</div>
             </div>
           </div>
-        </div>`).join('')}
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Section 5: Target Date ── -->
-  <div class="db-section" style="width:100%">
-    <div class="db-section-label">Target Date</div>
-    <div class="db-card">
-      <div class="db-target-inner">
-        <div class="db-target-col">
-          <div class="db-target-lbl">Deadline</div>
-          <div class="db-target-val">${TARGET_DATE_STR}</div>
-        </div>
-        <div class="db-target-col">
-          <div class="db-days-num">${daysLeft}</div>
-          <div class="db-days-lbl">days remaining</div>
-          <span class="db-days-urgency ${urgencyClass}">${urgencyLabel}</span>
-        </div>
-        <div class="db-target-col">
-          <div class="db-target-lbl">Still to review</div>
-          <div class="db-target-val">${pending} items</div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ── Bottom CTA ── -->
-  <div style="width:100%;margin-top:4px;margin-bottom:40px">
-    <button class="db-cta" onclick="showWorklist()">
-      Start Reviewing — ${pending} items remaining
-    </button>
-  </div>
+      <!-- Attention Needed -->
+      <div class="db-rp-card">
+        <div class="db-rp-title">Attention Needed</div>
+        ${redItems.length === 0
+          ? `<div class="db-attn-empty">No critical items — you're all good!</div>`
+          : `<div class="db-attn-list">
+              ${redItems.map(item => `
+              <div class="db-attn-row" onclick="showWorklist();filterQueue('red');(function(){const el=document.querySelector('.q-item[data-key=\\'${item.key}\\']');if(el)selectItem(el)})()">
+                <span class="db-attn-dot"></span>
+                <div class="db-attn-body">
+                  <div class="db-attn-name">${item.name}</div>
+                  <div class="db-attn-sub">${item.site}</div>
+                </div>
+                <span class="db-attn-arr">›</span>
+              </div>`).join('')}
+            </div>`
+        }
+        ${redItems.length > 0 ? `
+        <button class="db-prog-link" style="margin-top:12px;font-size:11.5px" onclick="showWorklist();filterQueue('red')">
+          View all ${redItems.length} red items ›
+        </button>` : ''}
+      </div>
 
-</div>
+      <!-- Target Date -->
+      <div class="db-rp-card">
+        <div class="db-rp-title">Target Date</div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:15px;font-weight:700;color:#0F172A;letter-spacing:-.2px">${TARGET_DATE_STR}</div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:2px">Review deadline</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">
+          <span class="db-days-num" style="font-size:24px">${daysLeft}</span>
+          <span style="font-size:11.5px;color:#64748B">days remaining</span>
+        </div>
+        <span class="db-days-urgency ${urgencyClass}">${urgencyLabel}</span>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F1F5F9;font-size:11.5px;color:#64748B">
+          <span style="font-weight:600;color:#0F172A">${pending}</span> items still to review
+        </div>
+      </div>
+
+    </div><!-- /col-right -->
+
+  </div><!-- /db-layout -->
+
+</div><!-- /db-wrap -->
   `;
 }
 

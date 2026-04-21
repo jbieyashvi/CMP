@@ -762,29 +762,57 @@ body {
 
 /* Right-panel base card */
 .db-rp-card {
-  background: #FAFAFA;
+  background: #fff;
   border: 1px solid #F1F5F9;
   border-radius: 12px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.035);
 }
 .db-rp-card:last-child { margin-bottom: 0; }
 .db-rp-title {
   font-size: 9.5px; font-weight: 700; color: #CBD5E1;
-  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 14px;
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px;
 }
+/* Attention Needed — soft red tint, no harsh border */
+.db-rp-card-critical {
+  background: #FFF8F8;
+  border-color: #FECACA;
+}
+.db-rp-card-critical .db-rp-title { color: #E05252; }
 
-/* Quick Stats — 3-col inside right card */
-.db-qs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+/* Quick Stats — flat row, no nested card borders */
+.db-qs-row {
+  display: flex; align-items: center;
+  gap: 0; margin-bottom: 14px;
+}
 .db-qs-item {
-  text-align: center; padding: 12px 6px;
-  background: #fff; border: 1px solid #F1F5F9; border-radius: 9px;
+  flex: 1; text-align: center; padding: 4px 0;
+}
+.db-qs-item + .db-qs-item {
+  border-left: 1px solid #F1F5F9;
 }
 .db-qs-num {
-  font-size: 22px; font-weight: 700; color: #0F172A;
-  letter-spacing: -.5px; line-height: 1; margin-bottom: 5px;
+  font-size: 20px; font-weight: 700; color: #0F172A;
+  letter-spacing: -.5px; line-height: 1; margin-bottom: 4px;
 }
 .db-qs-lbl { font-size: 10px; color: #94A3B8; line-height: 1.3; }
+
+/* Right-column primary CTA */
+.db-rc-cta {
+  width: 100%; padding: 11px 16px;
+  background: #0F172A; color: #fff;
+  border: none; border-radius: 10px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; transition: background .13s; letter-spacing: -.1px;
+}
+.db-rc-cta:hover { background: #1E293B; }
+.db-rc-cta-badge {
+  font-size: 11px; font-weight: 500;
+  background: rgba(255,255,255,.15);
+  padding: 2px 9px; border-radius: 20px; opacity: .85;
+}
 
 /* Recent Activity */
 .db-act-list { display: flex; flex-direction: column; }
@@ -832,15 +860,7 @@ body {
 .db-header-left {}
 .db-title { font-size: 18px; font-weight: 700; color: #0F172A; letter-spacing: -.3px; }
 .db-date  { font-size: 11.5px; color: #94A3B8; margin-top: 2px; }
-.db-header-cta {
-  padding: 9px 18px;
-  background: #0F172A; color: #fff;
-  border: none; border-radius: 8px;
-  font-size: 12.5px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; gap: 7px;
-  transition: background .13s; letter-spacing: -.1px; flex-shrink: 0;
-}
-.db-header-cta:hover { background: #1E293B; }
+.db-header-cta { display: none; } /* CTA lives in right column, not header */
 
 /* Section rhythm */
 .db-section { margin-bottom: 28px; }
@@ -885,9 +905,21 @@ body {
 .db-q-red   .db-q-num { color: #991B1B; }
 .db-q-blue  .db-q-num { color: #1D4ED8; }
 .db-q-green .db-q-num { color: #065F46; }
-.db-q-arrow { font-size: 14px; color: #CBD5E1; line-height: 1; margin-top: 2px; }
+.db-q-arrow { font-size: 14px; color: #CBD5E1; line-height: 1; margin-top: 2px; transition: transform .12s; }
+.db-q-card:hover .db-q-arrow { transform: translateX(2px); }
 .db-q-name { font-size: 12.5px; font-weight: 600; color: #334155; margin-bottom: 3px; }
 .db-q-hint { font-size: 10.5px; color: #94A3B8; line-height: 1.4; }
+.db-q-view {
+  font-size: 10.5px; font-weight: 500; margin-top: 11px;
+  opacity: 0; transform: translateY(2px);
+  transition: opacity .15s, transform .15s;
+  display: flex; align-items: center; gap: 3px;
+}
+.db-q-amber .db-q-view { color: #B45309; }
+.db-q-red   .db-q-view { color: #DC2626; }
+.db-q-blue  .db-q-view { color: #2563EB; }
+.db-q-green .db-q-view { color: #059669; }
+.db-q-card:hover .db-q-view { opacity: 1; transform: translateY(0); }
 
 /* ── Progress card ── */
 .db-prog-main {
@@ -929,19 +961,25 @@ body {
 
 /* ── Workload (single card, inline rows) ── */
 .db-wl-card { overflow: hidden; }
-.db-wl-rows {}
 .db-wl-row {
-  display: flex; align-items: center; gap: 16px;
-  padding: 14px 22px;
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px 22px;
 }
 .db-wl-row + .db-wl-row { border-top: 1px solid #F8FAFC; }
 .db-wl-info { flex: 1; min-width: 0; }
 .db-wl-name { font-size: 12.5px; font-weight: 600; color: #0F172A; margin-bottom: 1px; }
-.db-wl-desc { font-size: 11px; color: #94A3B8; }
-.db-wl-right { text-align: right; flex-shrink: 0; }
-.db-wl-stat { font-size: 12px; color: #64748B; margin-bottom: 7px; white-space: nowrap; }
-.db-wl-stat strong { color: #0F172A; font-weight: 600; }
-.db-mini-wrap { width: 100px; }
+.db-wl-desc { font-size: 11px; color: #94A3B8; margin-bottom: 6px; }
+.db-wl-status {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 20px; font-size: 10px; font-weight: 600;
+}
+.db-wl-status-ok   { background: #ECFDF5; color: #065F46; }
+.db-wl-status-risk { background: #FFF7ED; color: #92400E; }
+.db-wl-status-done { background: #F0FDF4; color: #065F46; }
+.db-wl-right { text-align: right; flex-shrink: 0; padding-top: 2px; }
+.db-wl-pct-big { font-size: 20px; font-weight: 700; color: #0F172A; letter-spacing: -.4px; line-height: 1; }
+.db-wl-stat { font-size: 11px; color: #94A3B8; margin-top: 2px; margin-bottom: 8px; white-space: nowrap; }
+.db-mini-wrap { width: 90px; margin-left: auto; }
 .db-mini-track { height: 4px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
 .db-mini-fill  { height: 100%; background: #94A3B8; border-radius: 3px; transition: width .5s; }
 
@@ -973,6 +1011,301 @@ body {
   transition: background .14s; letter-spacing: -.1px;
 }
 .db-cta:hover { background: #1E293B; }
+
+/* ─── Exceptions view ───────────────────────── */
+#exceptions-view {
+  flex: 1; overflow: hidden;
+  display: flex;
+}
+
+/* List panel */
+.exc-panel {
+  width: 292px; flex-shrink: 0;
+  background: #fff; border-right: 1px solid #E8ECF2;
+  display: flex; flex-direction: column;
+}
+.exc-panel-header {
+  padding: 16px 14px 12px;
+  border-bottom: 1px solid #F1F5F9;
+}
+.exc-panel-title {
+  font-size: 13px; font-weight: 600; color: #0F172A;
+  margin-bottom: 12px; letter-spacing: -.1px;
+}
+.exc-ftab-row { display: flex; gap: 5px; }
+.exc-ftab {
+  padding: 5px 11px; border-radius: 20px;
+  font-size: 11px; font-weight: 500; cursor: pointer;
+  color: #94A3B8; background: #F8FAFC;
+  border: 1px solid transparent;
+  display: flex; align-items: center; gap: 4px;
+  transition: all .12s;
+}
+.exc-ftab:hover { color: #334155; background: #F1F5F9; }
+.exc-ftab.active { color: #334155; background: #EEF2F7; border-color: #E2E8F0; font-weight: 600; }
+.exc-ftab-count { font-size: 9.5px; font-weight: 700; }
+
+.exc-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+
+/* List rows */
+.exc-item {
+  padding: 11px 14px; cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background .1s;
+}
+.exc-item:hover  { background: #F8FAFC; }
+.exc-item.selected { background: #F1F5F9; border-left-color: #0F172A; }
+.exc-item-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 8px; margin-bottom: 3px;
+}
+.exc-item-name { font-size: 12.5px; font-weight: 600; color: #0F172A; line-height: 1.3; }
+.exc-item-meta { font-size: 10.5px; color: #94A3B8; margin-bottom: 7px; }
+.exc-item-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* Issue-type badges */
+.exc-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 9.5px; font-weight: 600; white-space: nowrap;
+  border: 1px solid;
+}
+.exc-b-no-apl        { background: #FFF7ED; color: #C2410C; border-color: #FED7AA; }
+.exc-b-data-mismatch { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+.exc-b-mapping-failed{ background: #FDF4FF; color: #7E22CE; border-color: #E9D5FF; }
+.exc-b-discontinued  { background: #FFF5F5; color: #991B1B; border-color: #FECACA; }
+
+/* Status pills */
+.exc-status-pill {
+  font-size: 9.5px; font-weight: 600; padding: 2px 7px;
+  border-radius: 20px; white-space: nowrap; border: 1px solid;
+}
+.exc-pill-open        { background: #FFFBEB; color: #92400E; border-color: #FDE68A; }
+.exc-pill-inprogress  { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+.exc-pill-resolved    { background: #ECFDF5; color: #065F46; border-color: #BBF7D0; }
+
+/* Urgency text in list rows */
+.exc-urgency-high   { font-size: 10.5px; color: #DC2626; font-weight: 600; }
+.exc-urgency-medium { font-size: 10.5px; color: #D97706; font-weight: 500; }
+.exc-urgency-normal { font-size: 10.5px; color: #94A3B8; }
+
+/* In-progress detail banner */
+.exc-inprogress-banner {
+  background: #EFF6FF; border: 1px solid #BFDBFE;
+  border-radius: 10px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 0;
+}
+.exc-inprogress-banner-text { font-size: 12.5px; color: #1D4ED8; font-weight: 500; }
+.exc-inprogress-banner-sub  { font-size: 11px; color: #3B82F6; margin-top: 2px; }
+
+/* Clickable action inside rec card */
+.exc-rec-action-row {
+  display: flex; margin-top: 12px; padding-top: 11px;
+  border-top: 1px solid #FDE68A;
+}
+.exc-rec-action-btn {
+  font-size: 11.5px; font-weight: 600; color: #92400E;
+  background: none; border: none; cursor: pointer; padding: 0;
+  display: flex; align-items: center; gap: 5px;
+  transition: color .12s;
+}
+.exc-rec-action-btn:hover { color: #78350F; }
+
+/* Detail panel */
+.exc-detail {
+  flex: 1; min-width: 0; overflow-y: auto;
+  background: #fff; display: flex; flex-direction: column;
+}
+.exc-detail-header {
+  padding: 20px 26px 16px;
+  border-bottom: 1px solid #F1F5F9;
+}
+.exc-detail-title {
+  font-size: 18px; font-weight: 700; color: #0F172A;
+  letter-spacing: -.3px; margin-bottom: 8px;
+}
+.exc-detail-meta {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+}
+.exc-detail-body { padding: 22px 26px; flex: 1; }
+
+.exc-field { margin-bottom: 22px; }
+.exc-field-label {
+  font-size: 9.5px; font-weight: 700; color: #CBD5E1;
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px;
+}
+.exc-field-value { font-size: 13px; color: #334155; line-height: 1.65; }
+
+.exc-ctx-card {
+  background: #F8FAFC; border: 1px solid #F1F5F9;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+}
+.exc-ctx-val { font-size: 12.5px; color: #475569; line-height: 1.65; }
+
+.exc-rec-card {
+  background: #FFFBEB; border: 1px solid #FDE68A;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+}
+.exc-rec-card .exc-field-label { color: #B45309; }
+.exc-rec-val { font-size: 12.5px; color: #78350F; line-height: 1.65; }
+
+.exc-resolved-banner {
+  background: #ECFDF5; border: 1px solid #BBF7D0;
+  border-radius: 10px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.exc-resolved-banner-text { font-size: 12.5px; color: #065F46; font-weight: 500; }
+.exc-resolved-banner-sub  { font-size: 11px; color: #059669; margin-top: 2px; }
+
+/* Action panel */
+.exc-action-panel {
+  width: 228px; flex-shrink: 0;
+  background: #fff; border-left: 1px solid #E8ECF2;
+  display: flex; flex-direction: column;
+}
+.exc-action-topbar {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #F1F5F9;
+  font-size: 10px; font-weight: 700; color: #94A3B8;
+  text-transform: uppercase; letter-spacing: .6px;
+}
+.exc-action-body {
+  padding: 14px 14px; flex: 1;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.exc-action-btn {
+  width: 100%; padding: 10px 14px; border-radius: 9px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  border: 1px solid; text-align: left;
+  display: flex; align-items: center; gap: 9px;
+  transition: background .12s, border-color .12s, color .12s;
+  line-height: 1.3;
+}
+.exc-btn-primary   { background: #0F172A; color: #fff; border-color: #0F172A; }
+.exc-btn-primary:hover { background: #1E293B; border-color: #1E293B; }
+.exc-btn-secondary { background: #fff; color: #334155; border-color: #E2E8F0; }
+.exc-btn-secondary:hover { background: #F8FAFC; border-color: #94A3B8; }
+.exc-btn-ghost { background: transparent; color: #94A3B8; border-color: transparent; font-weight: 500; }
+.exc-btn-ghost:hover { background: #F8FAFC; color: #334155; border-color: #F1F5F9; }
+
+.exc-action-divider { height: 1px; background: #F1F5F9; }
+.exc-action-note { font-size: 11px; color: #94A3B8; line-height: 1.5; padding: 2px 2px; }
+
+.exc-no-selection {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; padding: 40px 24px; text-align: center;
+  color: #94A3B8;
+}
+.exc-no-sel-title { font-size: 13px; font-weight: 500; color: #64748B; }
+.exc-no-sel-sub   { font-size: 11.5px; }
+
+/* ─── Create APL modal ──────────────────────── */
+.apl-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.4);
+  backdrop-filter: blur(2px);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  animation: modalFadeIn .14s ease;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+.apl-modal {
+  background: #fff; border-radius: 14px;
+  width: 440px; max-width: calc(100vw - 40px);
+  box-shadow: 0 24px 64px rgba(0,0,0,.16), 0 4px 16px rgba(0,0,0,.06);
+  animation: modalSlideUp .18s cubic-bezier(.22,1,.36,1);
+}
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+.apl-modal-header {
+  padding: 22px 22px 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.apl-modal-title { font-size: 15px; font-weight: 700; color: #0F172A; letter-spacing: -.2px; }
+.apl-modal-sub   { font-size: 11.5px; color: #94A3B8; margin-top: 3px; }
+.apl-modal-close {
+  width: 28px; height: 28px; border-radius: 7px; border: none;
+  background: #F1F5F9; color: #64748B; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s;
+}
+.apl-modal-close:hover { background: #E2E8F0; color: #334155; }
+
+.apl-modal-body { padding: 20px 22px 4px; }
+
+.apl-form-field { margin-bottom: 15px; }
+.apl-form-label {
+  font-size: 11px; font-weight: 600; color: #334155;
+  margin-bottom: 6px; display: block; letter-spacing: -.1px;
+}
+.apl-required { color: #EF4444; margin-left: 2px; }
+.apl-form-input {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid #E2E8F0; border-radius: 8px;
+  font-size: 13px; color: #0F172A; background: #fff;
+  outline: none; font-family: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+.apl-form-input:focus {
+  border-color: #94A3B8;
+  box-shadow: 0 0 0 3px rgba(148,163,184,.14);
+}
+.apl-form-input.apl-input-error { border-color: #EF4444; }
+.apl-form-input.apl-input-error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
+.apl-form-input::placeholder { color: #CBD5E1; }
+
+.apl-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Pack size: number + unit selector joined */
+.apl-pack-wrap { display: flex; }
+.apl-pack-num {
+  flex: 1; border-radius: 8px 0 0 8px !important;
+  border-right: none !important;
+}
+.apl-pack-num:focus { position: relative; z-index: 1; border-right: none !important; }
+.apl-pack-unit {
+  width: 68px; padding: 0 8px;
+  border: 1px solid #E2E8F0; border-radius: 0 8px 8px 0;
+  background: #F8FAFC; color: #475569;
+  font-size: 12.5px; font-family: inherit; cursor: pointer; outline: none;
+  border-left: 1px solid #E2E8F0;
+}
+
+/* Currency prefix */
+.apl-currency-wrap { position: relative; }
+.apl-currency-sym {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: #94A3B8; pointer-events: none; font-weight: 500;
+}
+.apl-currency-input { padding-left: 24px !important; }
+
+/* Inline field error */
+.apl-field-error {
+  font-size: 11px; color: #EF4444; margin-top: 4px; display: none;
+}
+.apl-field-error.visible { display: block; }
+
+.apl-modal-footer {
+  padding: 16px 22px 20px;
+  display: flex; gap: 8px; justify-content: flex-end;
+  border-top: 1px solid #F8FAFC; margin-top: 6px;
+}
+.apl-modal-btn {
+  padding: 9px 20px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  border: 1px solid; font-family: inherit;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.apl-modal-cancel { background: #fff; color: #64748B; border-color: #E2E8F0; }
+.apl-modal-cancel:hover { background: #F8FAFC; border-color: #CBD5E1; }
+.apl-modal-submit { background: #0F172A; color: #fff; border-color: #0F172A; }
+.apl-modal-submit:hover { background: #1E293B; }
+.apl-modal-submit:disabled { opacity: .45; cursor: not-allowed; }
 
 /* ─── Loading spinner on buttons ────────────── */
 @keyframes btn-spin { to { transform: rotate(360deg); } }
@@ -1032,6 +1365,14 @@ body {
         <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
       </svg>
       Queue List
+    </div>
+    <div class="nav-item" id="nav-exceptions" onclick="showExceptions()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      Exceptions
     </div>
   </nav>
 </div>
@@ -1136,6 +1477,46 @@ body {
 </div>
 
 </div><!-- /#queue-view -->
+
+<!-- ═══ Exceptions View ═════════════════════════════ -->
+<div id="exceptions-view" style="display:none">
+
+  <!-- List panel -->
+  <div class="exc-panel">
+    <div class="exc-panel-header">
+      <div class="exc-panel-title">Exceptions</div>
+      <div class="exc-ftab-row" id="exc-ftab-row">
+        <div class="exc-ftab active" data-filter="all"         onclick="setExcFilter('all')">All <span class="exc-ftab-count" id="exc-count-all">0</span></div>
+        <div class="exc-ftab"        data-filter="open"        onclick="setExcFilter('open')">Open <span class="exc-ftab-count" id="exc-count-open">0</span></div>
+        <div class="exc-ftab"        data-filter="in-progress" onclick="setExcFilter('in-progress')">In Progress <span class="exc-ftab-count" id="exc-count-inprogress">0</span></div>
+        <div class="exc-ftab"        data-filter="resolved"    onclick="setExcFilter('resolved')">Done <span class="exc-ftab-count" id="exc-count-resolved">0</span></div>
+      </div>
+    </div>
+    <div class="exc-list" id="exc-list"></div>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="exc-detail" id="exc-detail">
+    <div class="exc-no-selection">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div class="exc-no-sel-title">Select an exception</div>
+      <div class="exc-no-sel-sub">Choose an item from the list to view details</div>
+    </div>
+  </div>
+
+  <!-- Action panel -->
+  <div class="exc-action-panel" id="exc-action-panel">
+    <div class="exc-action-topbar">Actions</div>
+    <div class="exc-action-body" id="exc-action-body">
+      <div class="exc-action-note">Select an exception to see available actions.</div>
+    </div>
+  </div>
+
+</div><!-- /#exceptions-view -->
 
 <!-- ═══════════════════════════════════════════════
      DATA + LOGIC
@@ -3237,21 +3618,6 @@ const TARGET_DATE_STR = '30 April 2026';
 const TARGET_DATE_OBJ = new Date('2026-04-30');
 const TODAY_OBJ       = new Date('2026-04-20');
 
-function showDashboard() {
-  renderDashboard();
-  document.getElementById('dashboard-view').style.display = 'flex';
-  document.getElementById('queue-view').style.display     = 'none';
-  document.getElementById('nav-dashboard').classList.add('active');
-  document.getElementById('nav-worklist').classList.remove('active');
-}
-
-function showWorklist() {
-  document.getElementById('dashboard-view').style.display = 'none';
-  document.getElementById('queue-view').style.display     = 'flex';
-  document.getElementById('nav-worklist').classList.add('active');
-  document.getElementById('nav-dashboard').classList.remove('active');
-}
-
 function renderDashboard() {
   const all    = Object.values(ITEMS);
   const total  = all.length;
@@ -3292,26 +3658,24 @@ function renderDashboard() {
   // Green items for Recent Activity
   const greenItems = all.filter(i => i.queue === 'green');
 
+  // Per-batch status label
+  function batchStatusLabel(s) {
+    if (s.pct === 100) return { cls: 'db-wl-status-done', lbl: 'Complete' };
+    if (s.pct >= 50 || daysLeft > 7) return { cls: 'db-wl-status-ok', lbl: 'On track' };
+    return { cls: 'db-wl-status-risk', lbl: 'At risk' };
+  }
+  const origStatus = batchStatusLabel(origStats);
+  const incrStatus = batchStatusLabel(incrStats);
+
   document.getElementById('dashboard-view').innerHTML = `
 <div class="db-wrap">
 
-  <!-- ── Header (full width) ── -->
+  <!-- ── Header ── -->
   <div class="db-header">
     <div class="db-header-left">
       <div class="db-title">Where things stand</div>
       <div class="db-date">${todayStr}</div>
     </div>
-    <button class="db-header-cta" onclick="showWorklist()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-        <line x1="9" y1="6" x2="20" y2="6"/>
-        <line x1="9" y1="12" x2="20" y2="12"/>
-        <line x1="9" y1="18" x2="20" y2="18"/>
-        <circle cx="4" cy="6"  r="1.5" fill="currentColor" stroke="none"/>
-        <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/>
-        <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
-      </svg>
-      Start Reviewing
-    </button>
   </div>
 
   <!-- ── 2-Column Body ── -->
@@ -3324,26 +3688,18 @@ function renderDashboard() {
       <div class="db-section">
         <div class="db-section-label">Queue Summary</div>
         <div class="db-queue-grid">
-          <div class="db-q-card db-q-amber" onclick="showWorklist();filterQueue('amber')">
-            <div class="db-q-top"><div class="db-q-num">${amber}</div><span class="db-q-arrow">›</span></div>
-            <div class="db-q-name">Amber</div>
-            <div class="db-q-hint">Needs review</div>
-          </div>
-          <div class="db-q-card db-q-red" onclick="showWorklist();filterQueue('red')">
-            <div class="db-q-top"><div class="db-q-num">${red}</div><span class="db-q-arrow">›</span></div>
-            <div class="db-q-name">Red</div>
-            <div class="db-q-hint">Needs mapping</div>
-          </div>
-          <div class="db-q-card db-q-blue" onclick="showWorklist();filterQueue('blue')">
-            <div class="db-q-top"><div class="db-q-num">${blue}</div><span class="db-q-arrow">›</span></div>
-            <div class="db-q-name">Blue</div>
-            <div class="db-q-hint">Transition required</div>
-          </div>
-          <div class="db-q-card db-q-green" onclick="showWorklist();filterQueue('green')">
-            <div class="db-q-top"><div class="db-q-num">${green}</div><span class="db-q-arrow">›</span></div>
-            <div class="db-q-name">Green</div>
-            <div class="db-q-hint">Completed</div>
-          </div>
+          ${[
+            { q:'amber', n:amber, label:'Amber', hint:'Needs review',       viewTxt:'Review items' },
+            { q:'red',   n:red,   label:'Red',   hint:'Needs mapping',      viewTxt:'Assign suppliers' },
+            { q:'blue',  n:blue,  label:'Blue',  hint:'Transition required', viewTxt:'Review transitions' },
+            { q:'green', n:green, label:'Green', hint:'Completed',           viewTxt:'View completed' }
+          ].map(c => `
+          <div class="db-q-card db-q-${c.q}" onclick="showWorklist();filterQueue('${c.q}')">
+            <div class="db-q-top"><div class="db-q-num">${c.n}</div><span class="db-q-arrow">›</span></div>
+            <div class="db-q-name">${c.label}</div>
+            <div class="db-q-hint">${c.hint}</div>
+            <div class="db-q-view">${c.viewTxt} →</div>
+          </div>`).join('')}
         </div>
       </div>
 
@@ -3351,15 +3707,18 @@ function renderDashboard() {
       <div class="db-section">
         <div class="db-section-label">Overall Progress</div>
         <div class="db-card" style="cursor:pointer" onclick="showWorklist();filterQueue('amber')">
-          <div>
-            <span class="db-pct">${pct}%</span><span class="db-pct-sub">complete</span>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+            <div><span class="db-pct">${pct}%</span><span class="db-pct-sub">complete</span></div>
+            <span style="font-size:12px;color:#64748B">${green} / ${total} items mapped</span>
           </div>
-          <div class="db-prog-meta" style="margin-top:6px;margin-bottom:12px">
-            <span class="db-prog-pending">${pending} item${pending !== 1 ? 's' : ''} pending review</span>
-            <button class="db-prog-link" onclick="event.stopPropagation();showWorklist();filterQueue('amber')">View pending ›</button>
-          </div>
-          <div class="db-prog-track">
+          <div class="db-prog-track" style="margin-bottom:12px">
             <div class="db-prog-fill" style="width:${pct}%"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid #F8FAFC">
+            <span class="db-prog-pending">${pending} item${pending !== 1 ? 's' : ''} pending — review needed</span>
+            <button class="db-prog-link" onclick="event.stopPropagation();showWorklist();filterQueue('amber')">
+              Go to pending →
+            </button>
           </div>
         </div>
       </div>
@@ -3382,16 +3741,18 @@ function renderDashboard() {
         <div class="db-section-label">Workload</div>
         <div class="db-card db-wl-card" style="padding:0">
           ${[
-            { label:'Initial Assignment', desc:'Original MOG review items',    s: origStats },
-            { label:'Newly Added Items',  desc:'Incremental items added later', s: incrStats }
+            { label:'Initial Assignment', desc:'Original MOG review items',    s: origStats, st: origStatus },
+            { label:'Newly Added Items',  desc:'Incremental items added later', s: incrStats, st: incrStatus }
           ].map(r => `
           <div class="db-wl-row">
             <div class="db-wl-info">
               <div class="db-wl-name">${r.label}</div>
               <div class="db-wl-desc">${r.desc}</div>
+              <span class="db-wl-status ${r.st.cls}">${r.st.lbl}</span>
             </div>
             <div class="db-wl-right">
-              <div class="db-wl-stat"><strong>${r.s.done}</strong> / ${r.s.total} done</div>
+              <div class="db-wl-pct-big">${r.s.pct}%</div>
+              <div class="db-wl-stat">${r.s.done} / ${r.s.total} done</div>
               <div class="db-mini-wrap">
                 <div class="db-mini-track"><div class="db-mini-fill" style="width:${r.s.pct}%"></div></div>
               </div>
@@ -3400,25 +3761,50 @@ function renderDashboard() {
         </div>
       </div>
 
-      <!-- Bottom CTA -->
-      <div style="margin-bottom:40px">
-        <button class="db-cta" onclick="showWorklist()">
-          Start Reviewing — ${pending} items remaining
-        </button>
-      </div>
 
     </div><!-- /col-left -->
 
     <!-- ════ RIGHT COLUMN ════ -->
     <div class="db-col-right">
 
-      <!-- Quick Stats -->
+      <!-- CTA — aligned with right column content -->
+      <button class="db-rc-cta" onclick="showWorklist()">
+        <span>Start Reviewing</span>
+        <span class="db-rc-cta-badge">${pending} pending</span>
+      </button>
+
+      <!-- 1. Attention Needed -->
+      <div class="db-rp-card ${redItems.length > 0 ? 'db-rp-card-critical' : ''}">
+        <div class="db-rp-title">Attention Needed</div>
+        ${redItems.length === 0
+          ? `<div class="db-attn-empty">
+               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" style="vertical-align:middle;margin-right:5px"><polyline points="20 6 9 17 4 12"/></svg>
+               No critical items right now
+             </div>`
+          : `<div class="db-attn-list">
+              ${redItems.map(item => `
+              <div class="db-attn-row" onclick="showWorklist();filterQueue('red');(function(){const el=document.querySelector('.q-item[data-key=\\'${item.key}\\']');if(el)selectItem(el)})()">
+                <span class="db-attn-dot"></span>
+                <div class="db-attn-body">
+                  <div class="db-attn-name">${item.name}</div>
+                  <div class="db-attn-sub">${item.pending} · ${item.site}</div>
+                </div>
+                <span class="db-attn-arr">›</span>
+              </div>`).join('')}
+            </div>
+            <button class="db-prog-link" style="margin-top:12px;font-size:11.5px" onclick="showWorklist();filterQueue('red')">
+              View all ${redItems.length} unmapped items →
+            </button>`
+        }
+      </div>
+
+      <!-- 2. Quick Stats (flat, low weight) -->
       <div class="db-rp-card">
         <div class="db-rp-title">Quick Stats</div>
-        <div class="db-qs-grid">
+        <div class="db-qs-row">
           <div class="db-qs-item">
             <div class="db-qs-num">${total}</div>
-            <div class="db-qs-lbl">Total Items</div>
+            <div class="db-qs-lbl">Total</div>
           </div>
           <div class="db-qs-item">
             <div class="db-qs-num" style="color:#C2410C">${pending}</div>
@@ -3426,88 +3812,62 @@ function renderDashboard() {
           </div>
           <div class="db-qs-item">
             <div class="db-qs-num" style="color:#065F46">${green}</div>
-            <div class="db-qs-lbl">Completed</div>
+            <div class="db-qs-lbl">Done</div>
           </div>
         </div>
-        <div style="margin-top:14px">
-          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#94A3B8;margin-bottom:5px">
-            <span>Completion</span><span style="color:#0F172A;font-weight:600">${pct}%</span>
-          </div>
-          <div class="db-prog-track" style="height:5px">
-            <div class="db-prog-fill" style="width:${pct}%"></div>
-          </div>
+        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#94A3B8;margin-bottom:5px">
+          <span>Completion</span>
+          <span style="color:#0F172A;font-weight:700">${pct}%</span>
         </div>
-        <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap">
-          <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#FFFBEB;color:#92400E;border:1px solid #FDE68A">Amber ${amber}</span>
-          <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#FFF5F5;color:#991B1B;border:1px solid #FECACA">Red ${red}</span>
-          <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE">Blue ${blue}</span>
+        <div class="db-prog-track" style="height:4px">
+          <div class="db-prog-fill" style="width:${pct}%"></div>
         </div>
       </div>
 
-      <!-- Recent Activity -->
+      <!-- 3. Recent Activity -->
       <div class="db-rp-card">
         <div class="db-rp-title">Recent Activity</div>
         <div class="db-act-list">
-          ${greenItems.slice(0, 3).map(item => `
+          ${greenItems.length === 0
+            ? `<div style="font-size:12px;color:#94A3B8;padding:4px 0">No confirmed items yet</div>`
+            : greenItems.slice(0, 3).map(item => `
           <div class="db-act-row">
             <div class="db-act-icon db-act-icon-green">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div class="db-act-body">
-              <div class="db-act-text">${item.name} mapped</div>
+              <div class="db-act-text">${item.name} confirmed</div>
               <div class="db-act-meta">${item.site}</div>
             </div>
           </div>`).join('')}
-          ${greenItems.length === 0 ? `<div style="font-size:12px;color:#94A3B8;padding:6px 0">No activity yet</div>` : ''}
-          <div class="db-act-row">
+          <div class="db-act-row" style="border-top:${greenItems.length > 0 ? '1px solid #F1F5F9' : 'none'}">
             <div class="db-act-icon db-act-icon-blue">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </div>
             <div class="db-act-body">
-              <div class="db-act-text">${incrStats.total} items added to queue</div>
-              <div class="db-act-meta">Incremental batch</div>
+              <div class="db-act-text">${incrStats.total} items added to batch</div>
+              <div class="db-act-meta">Incremental assignment</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Attention Needed -->
-      <div class="db-rp-card">
-        <div class="db-rp-title">Attention Needed</div>
-        ${redItems.length === 0
-          ? `<div class="db-attn-empty">No critical items — you're all good!</div>`
-          : `<div class="db-attn-list">
-              ${redItems.map(item => `
-              <div class="db-attn-row" onclick="showWorklist();filterQueue('red');(function(){const el=document.querySelector('.q-item[data-key=\\'${item.key}\\']');if(el)selectItem(el)})()">
-                <span class="db-attn-dot"></span>
-                <div class="db-attn-body">
-                  <div class="db-attn-name">${item.name}</div>
-                  <div class="db-attn-sub">${item.site}</div>
-                </div>
-                <span class="db-attn-arr">›</span>
-              </div>`).join('')}
-            </div>`
-        }
-        ${redItems.length > 0 ? `
-        <button class="db-prog-link" style="margin-top:12px;font-size:11.5px" onclick="showWorklist();filterQueue('red')">
-          View all ${redItems.length} red items ›
-        </button>` : ''}
-      </div>
-
-      <!-- Target Date -->
+      <!-- 4. Target Date -->
       <div class="db-rp-card">
         <div class="db-rp-title">Target Date</div>
-        <div style="margin-bottom:12px">
-          <div style="font-size:15px;font-weight:700;color:#0F172A;letter-spacing:-.2px">${TARGET_DATE_STR}</div>
-          <div style="font-size:11px;color:#94A3B8;margin-top:2px">Review deadline</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#0F172A;letter-spacing:-.2px">${TARGET_DATE_STR}</div>
+            <div style="font-size:11px;color:#94A3B8;margin-top:2px">Review deadline</div>
+          </div>
+          <span class="db-days-urgency ${urgencyClass}">${urgencyLabel}</span>
         </div>
-        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">
-          <span class="db-days-num" style="font-size:24px">${daysLeft}</span>
-          <span style="font-size:11.5px;color:#64748B">days remaining</span>
+        <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:12px">
+          <span style="font-size:26px;font-weight:700;color:#0F172A;letter-spacing:-.5px;line-height:1">${daysLeft}</span>
+          <span style="font-size:12px;color:#64748B">days remaining</span>
         </div>
-        <span class="db-days-urgency ${urgencyClass}">${urgencyLabel}</span>
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F1F5F9;font-size:11.5px;color:#64748B">
-          <span style="font-weight:600;color:#0F172A">${pending}</span> items still to review
+        <div style="padding-top:10px;border-top:1px solid #F8FAFC;font-size:11.5px;color:#64748B">
+          <span style="font-weight:600;color:#0F172A">${pending}</span> item${pending !== 1 ? 's' : ''} still to review
         </div>
       </div>
 
@@ -3517,6 +3877,487 @@ function renderDashboard() {
 
 </div><!-- /db-wrap -->
   `;
+}
+
+/* ─────────────────────────────────────────────────
+   EXCEPTIONS — data & state
+───────────────────────────────────────────────── */
+const EXCEPTIONS = {
+  'exc-guar-gum': {
+    key: 'exc-guar-gum', name: 'Guar Gum', daysPending: 9,
+    mog: 'Elementary MOG', category: 'Stabilisers', site: 'Mumbai MUM-PR-07',
+    issueType: 'no-apl', issueLabel: 'No APL exists', status: 'open', date: '11 Apr 2026',
+    description: 'No APL has been registered for this ingredient. It cannot be automatically mapped to a supplier.',
+    context: 'Added during recent category expansion. Supplier data was not migrated from the legacy procurement system.',
+    recommendation: 'Create a new APL entry to enable mapping, or send to Red queue for manual supplier assignment.',
+    recActionLabel: 'Create New APL', recActionFn: 'createAplForException'
+  },
+  'exc-carrageenan': {
+    key: 'exc-carrageenan', name: 'Carrageenan', daysPending: 8,
+    mog: 'Elementary MOG', category: 'Stabilisers', site: 'Bangalore BLR-WF-02',
+    issueType: 'discontinued', issueLabel: 'Supplier discontinued', status: 'open', date: '12 Apr 2026',
+    description: 'The mapped supplier has ceased operations. No active supplier exists in the APL for this ingredient.',
+    context: 'Supplier NutriCorp India shut down in March 2026. No replacement has been designated in the system.',
+    recommendation: 'Send to Mapping Queue to assign a new supplier, or escalate to Blue queue for transition planning.',
+    recActionLabel: 'Send to Mapping Queue', recActionFn: 'sendExcToQueue'
+  },
+  'exc-citric-acid': {
+    key: 'exc-citric-acid', name: 'Citric Acid', daysPending: 6,
+    mog: 'Elementary MOG', category: 'Acidulants', site: 'Delhi DEL-WH-03',
+    issueType: 'data-mismatch', issueLabel: 'Data mismatch', status: 'open', date: '14 Apr 2026',
+    description: 'Pack size in the MOG record (25 kg) does not match the APL entry (10 kg). Automated mapping cannot proceed.',
+    context: 'The APL was last updated in Q3 2025. The MOG record was revised in April 2026 following a procurement change.',
+    recommendation: 'Send to Mapping Queue for manual review once the correct pack size is confirmed with procurement.',
+    recActionLabel: 'Send to Mapping Queue', recActionFn: 'sendExcToQueue'
+  },
+  'exc-malt-extract': {
+    key: 'exc-malt-extract', name: 'Malt Extract', daysPending: 5,
+    mog: 'Elementary MOG', category: 'Flavourings', site: 'Chennai CHN-TR-09',
+    issueType: 'mapping-failed', issueLabel: 'Mapping failed', status: 'open', date: '15 Apr 2026',
+    description: 'The automated mapping process returned an error. The APL exists but could not be matched due to a supplier code format inconsistency.',
+    context: 'Supplier code format changed after a vendor consolidation in Feb 2026. APL record still uses the old format.',
+    recommendation: 'Send to Mapping Queue for manual re-mapping after updating the APL supplier code format.',
+    recActionLabel: 'Send to Mapping Queue', recActionFn: 'sendExcToQueue'
+  },
+  'exc-potato-starch': {
+    key: 'exc-potato-starch', name: 'Potato Starch', daysPending: 3,
+    mog: 'Elementary MOG', category: 'Starches', site: 'Pune PUN-WH-01',
+    issueType: 'no-apl', issueLabel: 'No APL exists', status: 'open', date: '17 Apr 2026',
+    description: 'No APL record found for this ingredient at the specified site. Site-specific APLs for Pune warehouse are incomplete.',
+    context: 'Pune warehouse was onboarded in January 2026. APL setup for the Starches category has not been completed.',
+    recommendation: 'Create a site-specific APL for Pune warehouse to enable automatic mapping.',
+    recActionLabel: 'Create New APL', recActionFn: 'createAplForException'
+  },
+  'exc-lecithin-soy': {
+    key: 'exc-lecithin-soy', name: 'Lecithin (Soy)', daysPending: 0,
+    mog: 'Elementary MOG', category: 'Emulsifiers', site: 'Kochi KCH-WF-06',
+    issueType: 'data-mismatch', issueLabel: 'Data mismatch', status: 'resolved', date: '12 Apr 2026',
+    resolvedDate: '19 Apr 2026',
+    description: 'Unit of measure in MOG (g) conflicted with APL entry (kg). Issue resolved after APL was updated to match procurement records.',
+    context: 'Issue identified during batch review. Procurement confirmed kg as the correct unit of measure.',
+    recommendation: 'No further action required. APL has been updated and mapping will proceed normally.',
+    recActionLabel: null, recActionFn: null
+  }
+};
+
+let currentExcKey = null;
+let excFilter = 'all';
+
+const EXC_BADGE_CLASS = {
+  'no-apl':        'exc-b-no-apl',
+  'data-mismatch': 'exc-b-data-mismatch',
+  'mapping-failed':'exc-b-mapping-failed',
+  'discontinued':  'exc-b-discontinued'
+};
+
+function excStatusPillClass(status) {
+  return status === 'resolved' ? 'exc-pill-resolved'
+       : status === 'in-progress' ? 'exc-pill-inprogress'
+       : 'exc-pill-open';
+}
+function excStatusLabel(status) {
+  return status === 'resolved' ? 'Resolved'
+       : status === 'in-progress' ? 'In Progress'
+       : 'Open';
+}
+function excUrgencyClass(days) {
+  return days >= 7 ? 'exc-urgency-high' : days >= 4 ? 'exc-urgency-medium' : 'exc-urgency-normal';
+}
+function excSortScore(e) {
+  // open (most days pending first) → in-progress → resolved
+  if (e.status === 'open')        return 1000 + e.daysPending;
+  if (e.status === 'in-progress') return 500  + e.daysPending;
+  return 0;
+}
+
+function showExceptions() {
+  renderExceptionsList();
+  document.getElementById('dashboard-view').style.display    = 'none';
+  document.getElementById('queue-view').style.display        = 'none';
+  document.getElementById('exceptions-view').style.display   = 'flex';
+  ['nav-dashboard','nav-worklist'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('nav-exceptions').classList.add('active');
+}
+
+function showDashboard() {
+  renderDashboard();
+  document.getElementById('dashboard-view').style.display    = 'flex';
+  document.getElementById('queue-view').style.display        = 'none';
+  document.getElementById('exceptions-view').style.display   = 'none';
+  document.getElementById('nav-dashboard').classList.add('active');
+  ['nav-worklist','nav-exceptions'].forEach(id => document.getElementById(id).classList.remove('active'));
+}
+
+function showWorklist() {
+  document.getElementById('dashboard-view').style.display    = 'none';
+  document.getElementById('queue-view').style.display        = 'flex';
+  document.getElementById('exceptions-view').style.display   = 'none';
+  document.getElementById('nav-worklist').classList.add('active');
+  ['nav-dashboard','nav-exceptions'].forEach(id => document.getElementById(id).classList.remove('active'));
+}
+
+function setExcFilter(filter) {
+  excFilter = filter;
+  document.querySelectorAll('.exc-ftab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
+  renderExceptionsList();
+}
+
+function renderExceptionsList() {
+  const all        = Object.values(EXCEPTIONS).sort((a,b) => excSortScore(b) - excSortScore(a));
+  const open       = all.filter(e => e.status === 'open');
+  const inProgress = all.filter(e => e.status === 'in-progress');
+  const resolved   = all.filter(e => e.status === 'resolved');
+
+  document.getElementById('exc-count-all').textContent        = all.length;
+  document.getElementById('exc-count-open').textContent       = open.length;
+  document.getElementById('exc-count-inprogress').textContent = inProgress.length;
+  document.getElementById('exc-count-resolved').textContent   = resolved.length;
+
+  const filtered = excFilter === 'open'        ? open
+                 : excFilter === 'in-progress'  ? inProgress
+                 : excFilter === 'resolved'     ? resolved
+                 : all;
+
+  const list = document.getElementById('exc-list');
+  list.innerHTML = filtered.map(exc => {
+    const urgClass = excUrgencyClass(exc.daysPending);
+    const daysTxt  = exc.status === 'resolved'
+      ? `<span class="exc-urgency-normal">Resolved ${exc.resolvedDate || ''}</span>`
+      : `<span class="${urgClass}">${exc.daysPending} day${exc.daysPending !== 1 ? 's' : ''} pending</span>`;
+    return `
+    <div class="exc-item${currentExcKey === exc.key ? ' selected' : ''}" onclick="selectException('${exc.key}')">
+      <div class="exc-item-top">
+        <div class="exc-item-name">${exc.name}</div>
+        <span class="exc-status-pill ${excStatusPillClass(exc.status)}">${excStatusLabel(exc.status)}</span>
+      </div>
+      <div class="exc-item-meta">${exc.category} · ${exc.site}</div>
+      <div class="exc-item-foot">
+        <span class="exc-badge ${EXC_BADGE_CLASS[exc.issueType]}">${exc.issueLabel}</span>
+        ${daysTxt}
+      </div>
+    </div>`;
+  }).join('') || `<div style="padding:20px 14px;font-size:12px;color:#94A3B8">No exceptions in this view</div>`;
+}
+
+function excDetailField(label, value) {
+  return `<div>
+    <div style="font-size:9.5px;font-weight:700;color:#CBD5E1;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">${label}</div>
+    <div style="font-size:12.5px;color:#334155">${value}</div>
+  </div>`;
+}
+
+function selectException(key) {
+  currentExcKey = key;
+  renderExceptionsList();
+  const exc = EXCEPTIONS[key];
+  if (!exc) return;
+
+  const status     = exc.status;
+  const isResolved = status === 'resolved';
+  const isInProg   = status === 'in-progress';
+
+  // ── Detail panel ──
+  const recBlock = isResolved
+    ? `<div class="exc-resolved-banner">
+         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+         <div>
+           <div class="exc-resolved-banner-text">Exception resolved</div>
+           <div class="exc-resolved-banner-sub">Marked resolved on ${exc.resolvedDate || exc.date}</div>
+         </div>
+       </div>`
+    : isInProg
+    ? `<div class="exc-inprogress-banner">
+         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+         <div>
+           <div class="exc-inprogress-banner-text">Sent to Mapping Queue</div>
+           <div class="exc-inprogress-banner-sub">Awaiting manual supplier assignment in Red queue</div>
+         </div>
+       </div>`
+    : `<div class="exc-rec-card">
+         <div class="exc-field-label">Recommended Action</div>
+         <div class="exc-rec-val">${exc.recommendation}</div>
+         ${exc.recActionLabel ? `
+         <div class="exc-rec-action-row">
+           <button class="exc-rec-action-btn" onclick="${exc.recActionFn}('${exc.key}')">
+             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+             ${exc.recActionLabel}
+           </button>
+         </div>` : ''}
+       </div>`;
+
+  document.getElementById('exc-detail').innerHTML = `
+    <div class="exc-detail-header">
+      <div class="exc-detail-title">${exc.name}</div>
+      <div class="exc-detail-meta">
+        <span class="exc-badge ${EXC_BADGE_CLASS[exc.issueType]}">${exc.issueLabel}</span>
+        <span class="exc-status-pill ${excStatusPillClass(status)}">${excStatusLabel(status)}</span>
+        ${!isResolved ? `<span class="${excUrgencyClass(exc.daysPending)}">${exc.daysPending} day${exc.daysPending !== 1 ? 's' : ''} pending</span>` : ''}
+      </div>
+    </div>
+    <div class="exc-detail-body">
+      <div class="exc-field">
+        <div class="exc-field-label">Issue Description</div>
+        <div class="exc-field-value">${exc.description}</div>
+      </div>
+      <div class="exc-ctx-card">
+        <div class="exc-field-label">Context</div>
+        <div class="exc-ctx-val">${exc.context}</div>
+      </div>
+      <div class="exc-field">
+        <div class="exc-field-label">Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          ${excDetailField('MOG', exc.mog)}
+          ${excDetailField('Category', exc.category)}
+          ${excDetailField('Location', exc.site)}
+          ${excDetailField('Logged', exc.date)}
+        </div>
+      </div>
+      ${recBlock}
+    </div>`;
+
+  // ── Action panel ──
+  const actionBody = document.getElementById('exc-action-body');
+  if (isResolved) {
+    actionBody.innerHTML = `
+      <div class="exc-action-note" style="color:#059669;font-weight:500;display:flex;align-items:center;gap:5px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+        Exception resolved
+      </div>
+      <div class="exc-action-divider"></div>
+      <button class="exc-action-btn exc-btn-ghost" onclick="reopenException('${exc.key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+        Reopen exception
+      </button>`;
+  } else if (isInProg) {
+    actionBody.innerHTML = `
+      <div class="exc-action-note" style="color:#1D4ED8;font-weight:500;display:flex;align-items:center;gap:5px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        In mapping queue
+      </div>
+      <div class="exc-action-note" style="margin-top:-2px">Pending manual review in the Red queue.</div>
+      <div class="exc-action-divider"></div>
+      <button class="exc-action-btn exc-btn-primary" onclick="resolveException('${exc.key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark as Resolved
+      </button>
+      <button class="exc-action-btn exc-btn-ghost" onclick="reopenException('${exc.key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+        Recall from queue
+      </button>`;
+  } else {
+    // Open — primary: Send to Queue, secondary: Create APL, ghost: Mark Resolved
+    actionBody.innerHTML = `
+      <button class="exc-action-btn exc-btn-primary" onclick="sendExcToQueue('${exc.key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send to Mapping Queue
+      </button>
+      <button class="exc-action-btn exc-btn-secondary" onclick="createAplForException('${exc.key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create New APL
+      </button>
+      <div class="exc-action-divider"></div>
+      <button class="exc-action-btn exc-btn-ghost" onclick="resolveException('${exc.key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark as Resolved
+      </button>
+      <div class="exc-action-note">Sending to queue adds this item to the Red queue for manual supplier assignment.</div>`;
+  }
+}
+
+function resolveException(key) {
+  EXCEPTIONS[key].status = 'resolved';
+  EXCEPTIONS[key].resolvedDate = TODAY_OBJ.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  selectException(key);
+  renderExceptionsList();
+  showToast('Exception marked as resolved');
+}
+
+function reopenException(key) {
+  EXCEPTIONS[key].status = 'open';
+  delete EXCEPTIONS[key].resolvedDate;
+  selectException(key);
+  renderExceptionsList();
+  showToast('Exception reopened');
+}
+
+function sendExcToQueue(key) {
+  EXCEPTIONS[key].status = 'in-progress';
+  selectException(key);
+  renderExceptionsList();
+  showToast(`${EXCEPTIONS[key].name} added to Red queue for mapping`);
+}
+
+function createAplForException(key) {
+  openCreateAplModal(key);
+}
+
+function openCreateAplModal(excKey) {
+  // Remove stale modal if any
+  const stale = document.getElementById('apl-modal-overlay');
+  if (stale) { document.removeEventListener('keydown', stale._esc); stale.remove(); }
+
+  const exc = EXCEPTIONS[excKey];
+  const overlay = document.createElement('div');
+  overlay.id = 'apl-modal-overlay';
+  overlay.className = 'apl-modal-overlay';
+  overlay.innerHTML = `
+    <div class="apl-modal" id="apl-modal">
+      <div class="apl-modal-header">
+        <div>
+          <div class="apl-modal-title">Create New APL</div>
+          <div class="apl-modal-sub">${exc.name} &middot; ${exc.site}</div>
+        </div>
+        <button class="apl-modal-close" onclick="closeCreateAplModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="apl-modal-body">
+
+        <!-- Supplier Name -->
+        <div class="apl-form-field">
+          <label class="apl-form-label" for="apl-supplier">
+            Supplier Name <span class="apl-required">*</span>
+          </label>
+          <input class="apl-form-input" id="apl-supplier" type="text"
+                 placeholder="e.g. Global Spice Co." autocomplete="off"
+                 oninput="aplClearErr('apl-supplier')">
+          <div class="apl-field-error" id="apl-supplier-err">Supplier name is required</div>
+        </div>
+
+        <!-- Pack Size + Cost side by side -->
+        <div class="apl-form-row">
+          <div class="apl-form-field">
+            <label class="apl-form-label" for="apl-pack">
+              Pack Size <span class="apl-required">*</span>
+            </label>
+            <div class="apl-pack-wrap">
+              <input class="apl-form-input apl-pack-num" id="apl-pack" type="number"
+                     min="0.01" step="any" placeholder="250"
+                     oninput="aplClearErr('apl-pack')">
+              <select class="apl-pack-unit" id="apl-unit">
+                <option>g</option><option>kg</option>
+                <option>mL</option><option>L</option><option>units</option>
+              </select>
+            </div>
+            <div class="apl-field-error" id="apl-pack-err">Enter a valid pack size</div>
+          </div>
+
+          <div class="apl-form-field">
+            <label class="apl-form-label" for="apl-cost">
+              Cost <span class="apl-required">*</span>
+            </label>
+            <div class="apl-currency-wrap">
+              <span class="apl-currency-sym">₹</span>
+              <input class="apl-form-input apl-currency-input" id="apl-cost" type="number"
+                     min="0.01" step="0.01" placeholder="0.00"
+                     oninput="aplClearErr('apl-cost')">
+            </div>
+            <div class="apl-field-error" id="apl-cost-err">Enter a valid cost</div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="apl-form-field" style="margin-bottom:0">
+          <label class="apl-form-label" for="apl-notes">
+            Notes <span style="color:#94A3B8;font-weight:400">(optional)</span>
+          </label>
+          <textarea class="apl-form-input" id="apl-notes" rows="2"
+                    placeholder="Any additional context for this APL…"
+                    style="resize:vertical;min-height:62px"></textarea>
+        </div>
+      </div>
+
+      <div class="apl-modal-footer">
+        <button class="apl-modal-btn apl-modal-cancel" onclick="closeCreateAplModal()">Cancel</button>
+        <button class="apl-modal-btn apl-modal-submit" id="apl-submit-btn"
+                onclick="submitCreateApl('${excKey}')">Create APL</button>
+      </div>
+    </div>`;
+
+  // Close on backdrop click
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeCreateAplModal(); });
+  // Close on Escape
+  overlay._esc = e => { if (e.key === 'Escape') closeCreateAplModal(); };
+  document.addEventListener('keydown', overlay._esc);
+
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('apl-supplier')?.focus(), 60);
+}
+
+function aplClearErr(inputId) {
+  document.getElementById(inputId)?.classList.remove('apl-input-error');
+  document.getElementById(inputId + '-err')?.classList.remove('visible');
+}
+
+function closeCreateAplModal() {
+  const overlay = document.getElementById('apl-modal-overlay');
+  if (!overlay) return;
+  document.removeEventListener('keydown', overlay._esc);
+  overlay.remove();
+}
+
+function submitCreateApl(excKey) {
+  const supplierEl = document.getElementById('apl-supplier');
+  const packEl     = document.getElementById('apl-pack');
+  const unitEl     = document.getElementById('apl-unit');
+  const costEl     = document.getElementById('apl-cost');
+  const notesEl    = document.getElementById('apl-notes');
+
+  const supplier = supplierEl?.value.trim();
+  const pack     = parseFloat(packEl?.value);
+  const unit     = unitEl?.value || 'g';
+  const cost     = parseFloat(costEl?.value);
+  const notes    = notesEl?.value.trim();
+
+  // Validate
+  let valid = true;
+  function markErr(inputId, show) {
+    document.getElementById(inputId)?.classList.toggle('apl-input-error', show);
+    document.getElementById(inputId + '-err')?.classList.toggle('visible', show);
+  }
+  markErr('apl-supplier', !supplier);         if (!supplier) valid = false;
+  markErr('apl-pack',     !pack || pack <= 0); if (!pack || pack <= 0) valid = false;
+  markErr('apl-cost',     !cost || cost <= 0); if (!cost || cost <= 0) valid = false;
+
+  if (!valid) return;
+
+  // Disable submit while "saving"
+  const btn = document.getElementById('apl-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+
+  setTimeout(() => {
+    // Build the new APL record
+    const newId  = 'APL-' + Math.random().toString(36).substr(2,5).toUpperCase();
+    const newApl = { id: newId, supplier, packSize: pack + unit, cost, notes };
+
+    // Inject into APL_POOL if the ingredient exists as a queue item
+    const exc = EXCEPTIONS[excKey];
+    if (typeof APL_POOL !== 'undefined') {
+      const matchKey = Object.keys(ITEMS).find(k =>
+        ITEMS[k].name.toLowerCase() === exc.name.toLowerCase()
+      );
+      if (matchKey) {
+        APL_POOL[matchKey] = APL_POOL[matchKey] || [];
+        APL_POOL[matchKey].push({
+          id: newId, brand: supplier,
+          packSize: pack + unit, cost, tag: null, isDefault: false
+        });
+      }
+    }
+
+    // Resolve exception and store created APL for display
+    EXCEPTIONS[excKey].status      = 'resolved';
+    EXCEPTIONS[excKey].resolvedDate = TODAY_OBJ.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    EXCEPTIONS[excKey].createdApl   = newApl;
+
+    closeCreateAplModal();
+    selectException(excKey);
+    renderExceptionsList();
+    showToast(`APL created — ${supplier} · ${pack}${unit} · ₹${cost.toFixed(2)}`);
+  }, 600);
 }
 
 /* ─────────────────────────────────────────────────

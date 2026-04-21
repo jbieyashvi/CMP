@@ -21,18 +21,23 @@ body {
 
 /* ─── Sidebar ────────────────────────────────── */
 .sidebar {
-  width: 192px;
+  width: 240px;
   background: #ffffff;
   border-right: 1px solid #E8ECF2;
   display: flex; flex-direction: column;
   flex-shrink: 0;
+  transition: width 260ms ease-in-out;
+  overflow: hidden;
 }
+.sidebar.collapsed { width: 64px; }
+
 .sidebar-brand {
-  padding: 18px 16px 14px;
+  padding: 16px 14px 14px;
   border-bottom: 1px solid #E8ECF2;
+  flex-shrink: 0;
 }
 .sidebar-brand-row {
-  display: flex; align-items: center; gap: 9px; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 9px;
 }
 .brand-icon {
   width: 28px; height: 28px;
@@ -40,19 +45,74 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-size: 9.5px; font-weight: 700; color: #475569; flex-shrink: 0;
 }
-.brand-name { font-size: 12.5px; font-weight: 600; color: #334155; }
-.brand-sub  { font-size: 10.5px; color: #94A3B8; margin-top: 1px; }
+.brand-text { flex: 1; min-width: 0; overflow: hidden; }
+.brand-name { font-size: 12.5px; font-weight: 600; color: #334155; white-space: nowrap; }
+.brand-sub  { font-size: 10.5px; color: #94A3B8; margin-top: 2px; white-space: nowrap; }
+
+/* Toggle button */
+.sidebar-toggle {
+  background: none; border: none; cursor: pointer;
+  padding: 4px; color: #CBD5E1; border-radius: 5px;
+  display: flex; align-items: center; flex-shrink: 0;
+  transition: color .15s, background .15s;
+}
+.sidebar-toggle:hover { color: #64748B; background: #F1F5F9; }
+.sidebar-toggle-icon { display: flex; transition: transform 260ms ease-in-out; }
+.sidebar.collapsed .sidebar-toggle-icon { transform: rotate(180deg); }
+
+/* Collapsed brand: center icon + toggle */
+.sidebar.collapsed .sidebar-brand { padding: 14px 0; }
+.sidebar.collapsed .sidebar-brand-row { justify-content: center; gap: 0; flex-wrap: wrap; }
+.sidebar.collapsed .brand-text { display: none; }
+.sidebar.collapsed .sidebar-toggle { margin: 0; }
+
+/* Nav */
 .sidebar-nav { padding: 10px 8px; }
+.sidebar.collapsed .sidebar-nav { padding: 10px 6px; }
+
 .nav-item {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 10px; border-radius: 7px;
   cursor: pointer; color: #94A3B8; font-size: 12.5px;
   margin-bottom: 2px; white-space: nowrap;
-  transition: background .12s, color .12s;
+  position: relative;
+  transition: background .12s, color .12s, padding 260ms ease-in-out, justify-content 260ms;
 }
 .nav-item:hover  { background: #F1F5F9; color: #334155; }
 .nav-item.active { background: #EEF2F7; color: #334155; font-weight: 500; }
 .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+.nav-label { transition: opacity 160ms ease-in-out; }
+
+/* Collapsed nav items */
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px 0;
+}
+.sidebar.collapsed .nav-label { display: none; }
+
+/* ─── Tooltips (collapsed only) ──────────────── */
+.sidebar.collapsed .nav-item::after {
+  content: attr(data-label);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%; transform: translateY(-50%);
+  background: #1E293B; color: #fff;
+  font-size: 11.5px; font-weight: 500; letter-spacing: .1px;
+  padding: 5px 10px; border-radius: 6px;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .14s;
+  z-index: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,.16);
+}
+.sidebar.collapsed .nav-item:hover::after { opacity: 1; }
+
+/* Nav divider */
+.nav-divider {
+  height: 1px; background: #F1F5F9;
+  margin: 8px 10px;
+  transition: margin 260ms ease-in-out;
+}
+.sidebar.collapsed .nav-divider { margin: 8px 6px; }
 
 /* ─── Queue Panel ────────────────────────────── */
 .queue-panel {
@@ -1014,36 +1074,137 @@ body {
 
 /* ─── Exceptions view ───────────────────────── */
 #exceptions-view {
-  flex: 1; overflow: hidden;
+  flex: 1; min-width: 0; overflow: hidden;
   display: flex;
 }
 
-/* List panel */
+/* List panel — 320px fixed */
 .exc-panel {
-  width: 292px; flex-shrink: 0;
+  width: 320px; flex-shrink: 0;
   background: #fff; border-right: 1px solid #E8ECF2;
   display: flex; flex-direction: column;
+  overflow: hidden;
 }
 .exc-panel-header {
   padding: 16px 14px 12px;
   border-bottom: 1px solid #F1F5F9;
+  position: sticky; top: 0; z-index: 10;
+  background: #fff;
 }
 .exc-panel-title {
   font-size: 13px; font-weight: 600; color: #0F172A;
   margin-bottom: 12px; letter-spacing: -.1px;
 }
-.exc-ftab-row { display: flex; gap: 5px; }
+.exc-ftab-row { display: flex; gap: 3px; flex-wrap: nowrap; }
 .exc-ftab {
-  padding: 5px 11px; border-radius: 20px;
-  font-size: 11px; font-weight: 500; cursor: pointer;
+  padding: 4px 8px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 500; cursor: pointer;
   color: #94A3B8; background: #F8FAFC;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   display: flex; align-items: center; gap: 4px;
-  transition: all .12s;
+  transition: all .14s;
+  white-space: nowrap; flex-shrink: 0;
 }
 .exc-ftab:hover { color: #334155; background: #F1F5F9; }
-.exc-ftab.active { color: #334155; background: #EEF2F7; border-color: #E2E8F0; font-weight: 600; }
-.exc-ftab-count { font-size: 9.5px; font-weight: 700; }
+
+/* All tab — active */
+.exc-ftab[data-filter="all"].active {
+  color: #0F172A; background: #EEF2F7; border-color: #CBD5E1; font-weight: 700;
+}
+/* Needs Action — amber */
+.exc-ftab[data-filter="open"].active {
+  color: #92400E; background: #FFFBEB; border-color: #FDE68A; font-weight: 700;
+}
+/* In Progress — blue */
+.exc-ftab[data-filter="in-progress"].active {
+  color: #1D4ED8; background: #EFF6FF; border-color: #BFDBFE; font-weight: 700;
+}
+/* Resolved — green */
+.exc-ftab[data-filter="resolved"].active {
+  color: #065F46; background: #ECFDF5; border-color: #A7F3D0; font-weight: 700;
+}
+
+/* Count badges */
+.exc-ftab-count {
+  font-size: 9px; font-weight: 700; min-width: 16px; height: 16px;
+  border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 4px; background: rgba(0,0,0,.06); color: inherit; line-height: 1;
+}
+.exc-ftab[data-filter="all"].active    .exc-ftab-count { background: #CBD5E1; color: #0F172A; }
+.exc-ftab[data-filter="open"].active   .exc-ftab-count { background: #FDE68A; color: #78350F; }
+.exc-ftab[data-filter="in-progress"].active .exc-ftab-count { background: #BFDBFE; color: #1E40AF; }
+.exc-ftab[data-filter="resolved"].active    .exc-ftab-count { background: #A7F3D0; color: #065F46; }
+
+/* ─── Type-filter dropdown ─────────────────────── */
+.exc-type-bar {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 10px; padding-top: 9px;
+  border-top: 1px solid #F1F5F9;
+  position: relative;
+}
+.exc-type-bar-label {
+  font-size: 10px; font-weight: 600; color: #CBD5E1;
+  text-transform: uppercase; letter-spacing: .5px;
+  white-space: nowrap; flex-shrink: 0; user-select: none;
+}
+.exc-type-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 8px 4px 10px; border-radius: 7px;
+  border: 1px solid #E2E8F0; background: #fff;
+  font-size: 11px; font-weight: 500; color: #64748B;
+  cursor: pointer; transition: all .14s; white-space: nowrap;
+  line-height: 1;
+}
+.exc-type-btn:hover { border-color: #CBD5E1; color: #334155; }
+.exc-type-btn.has-filter {
+  border-color: #0F172A; background: #0F172A; color: #fff;
+}
+.exc-type-btn .btn-chevron {
+  display: flex; flex-shrink: 0;
+  transition: transform .15s;
+}
+.exc-type-btn.open .btn-chevron { transform: rotate(180deg); }
+.exc-type-clear-x {
+  display: none; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(255,255,255,.25); cursor: pointer;
+  font-size: 10px; line-height: 1; flex-shrink: 0;
+  transition: background .12s;
+}
+.exc-type-btn.has-filter .exc-type-clear-x { display: flex; }
+.exc-type-btn.has-filter .exc-type-clear-x:hover { background: rgba(255,255,255,.4); }
+/* dropdown menu */
+.exc-type-dropdown {
+  position: absolute; top: calc(100% + 2px); left: 0;
+  background: #fff; border: 1px solid #E2E8F0;
+  border-radius: 9px; box-shadow: 0 8px 24px rgba(0,0,0,.09);
+  z-index: 300; min-width: 168px; overflow: hidden;
+  opacity: 0; transform: translateY(-4px); pointer-events: none;
+  transition: opacity .13s, transform .13s;
+}
+.exc-type-dropdown.open {
+  opacity: 1; transform: translateY(0); pointer-events: auto;
+}
+.exc-type-opt {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 13px; font-size: 11.5px; font-weight: 500;
+  color: #475569; cursor: pointer; transition: background .1s;
+  user-select: none;
+}
+.exc-type-opt:hover { background: #F8FAFC; color: #0F172A; }
+.exc-type-opt.active { background: #F1F5F9; color: #0F172A; font-weight: 600; }
+.exc-type-opt-icon {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: #E2E8F0;
+}
+.exc-type-opt.active .exc-type-opt-icon { background: #0F172A; }
+/* per-type icon colors (inactive) */
+.exc-type-opt[data-type="no-apl"]         .exc-type-opt-icon { background: #FCA5A5; }
+.exc-type-opt[data-type="data-mismatch"]  .exc-type-opt-icon { background: #FCD34D; }
+.exc-type-opt[data-type="mapping-failed"] .exc-type-opt-icon { background: #A78BFA; }
+.exc-type-opt[data-type="supplier-issue"] .exc-type-opt-icon { background: #7DD3FC; }
+/* active overrides */
+.exc-type-opt.active .exc-type-opt-icon { background: #0F172A; }
 
 .exc-list { flex: 1; overflow-y: auto; padding: 6px 0; }
 
@@ -1111,13 +1272,15 @@ body {
 }
 .exc-rec-action-btn:hover { color: #78350F; }
 
-/* Detail panel */
+/* Detail panel — fills remaining space */
 .exc-detail {
   flex: 1; min-width: 0; overflow-y: auto;
-  background: #fff; display: flex; flex-direction: column;
+  background: #F8FAFC; display: flex; flex-direction: column;
+  border-right: 1px solid #E8ECF2;
 }
 .exc-detail-header {
   padding: 20px 26px 16px;
+  background: #fff;
   border-bottom: 1px solid #F1F5F9;
 }
 .exc-detail-title {
@@ -1127,7 +1290,7 @@ body {
 .exc-detail-meta {
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
 }
-.exc-detail-body { padding: 22px 26px; flex: 1; }
+.exc-detail-body { padding: 22px 26px; flex: 1; background: #fff; }
 
 .exc-field { margin-bottom: 22px; }
 .exc-field-label {
@@ -1157,21 +1320,24 @@ body {
 .exc-resolved-banner-text { font-size: 12.5px; color: #065F46; font-weight: 500; }
 .exc-resolved-banner-sub  { font-size: 11px; color: #059669; margin-top: 2px; }
 
-/* Action panel */
+/* Action panel — 320px fixed, always visible */
 .exc-action-panel {
-  width: 228px; flex-shrink: 0;
+  width: 320px; flex-shrink: 0;
   background: #fff; border-left: 1px solid #E8ECF2;
   display: flex; flex-direction: column;
+  overflow: hidden;
 }
 .exc-action-topbar {
   padding: 14px 16px 12px;
   border-bottom: 1px solid #F1F5F9;
   font-size: 10px; font-weight: 700; color: #94A3B8;
   text-transform: uppercase; letter-spacing: .6px;
+  flex-shrink: 0;
 }
 .exc-action-body {
-  padding: 14px 14px; flex: 1;
+  padding: 16px; flex: 1; min-height: 0;
   display: flex; flex-direction: column; gap: 8px;
+  overflow-y: auto;
 }
 .exc-action-btn {
   width: 100%; padding: 10px 14px; border-radius: 9px;
@@ -1194,11 +1360,16 @@ body {
 .exc-no-selection {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 8px; padding: 40px 24px; text-align: center;
+  gap: 10px; padding: 40px 32px; text-align: center;
   color: #94A3B8;
 }
-.exc-no-sel-title { font-size: 13px; font-weight: 500; color: #64748B; }
-.exc-no-sel-sub   { font-size: 11.5px; }
+.exc-no-sel-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: #F1F5F9; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.exc-no-sel-title { font-size: 13px; font-weight: 600; color: #475569; margin-top: 4px; }
+.exc-no-sel-sub   { font-size: 11.5px; color: #94A3B8; line-height: 1.5; max-width: 200px; }
 
 /* ─── Create APL modal ──────────────────────── */
 .apl-modal-overlay {
@@ -1307,6 +1478,156 @@ body {
 .apl-modal-submit:hover { background: #1E293B; }
 .apl-modal-submit:disabled { opacity: .45; cursor: not-allowed; }
 
+/* ─── Filter Panel (queue) ───────────────────── */
+.search-row { position: relative; }
+.q-filter-panel {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  width: 236px;
+  background: #fff; border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.06);
+  z-index: 200; overflow: hidden;
+}
+.qfp-section { padding: 11px 14px 9px; }
+.qfp-section-title {
+  font-size: 9.5px; font-weight: 700; color: #94A3B8;
+  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px;
+}
+.qfp-divider { height: 1px; background: #F1F5F9; }
+.qfp-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 2px; cursor: pointer; border-radius: 5px;
+  user-select: none;
+  transition: background .1s;
+}
+.qfp-option:hover { background: #F8FAFC; }
+.qfp-checkbox {
+  width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
+  border: 1.5px solid #CBD5E1;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s, border-color .1s;
+}
+.qfp-checkbox.on { background: #0F172A; border-color: #0F172A; }
+.qfp-opt-label { font-size: 12px; color: #475569; line-height: 1; }
+.qfp-option.checked .qfp-opt-label { color: #0F172A; font-weight: 500; }
+.qfp-footer {
+  padding: 9px 14px 11px;
+  border-top: 1px solid #F1F5F9;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.qfp-clear {
+  font-size: 12px; color: #94A3B8; background: none; border: none;
+  cursor: pointer; padding: 0; font-weight: 500;
+  transition: color .1s;
+}
+.qfp-clear:hover { color: #334155; }
+.qfp-apply {
+  font-size: 12px; font-weight: 600; color: #fff;
+  background: #0F172A; border: none; border-radius: 7px;
+  padding: 7px 14px; cursor: pointer;
+  transition: background .12s;
+}
+.qfp-apply:hover { background: #1E293B; }
+.filter-icon-btn.active { background: #0F172A; border-color: #0F172A; }
+.filter-icon-btn.active svg { stroke: #fff; }
+.filter-icon-btn.active .fib-dot {
+  display: inline-block; width: 5px; height: 5px;
+  background: #4ADE80; border-radius: 50%;
+  position: absolute; top: 5px; right: 5px;
+}
+
+/* ─── Filter chips ───────────────────────────── */
+.q-chips {
+  display: none; flex-wrap: wrap; gap: 5px;
+  padding: 8px 14px 6px;
+  border-bottom: 1px solid #F1F5F9;
+}
+.q-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #EEF2F7; border-radius: 20px;
+  padding: 3px 7px 3px 9px;
+  font-size: 11px; font-weight: 500; color: #334155;
+}
+.q-chip-x {
+  background: none; border: none; cursor: pointer;
+  color: #94A3B8; display: flex; align-items: center; padding: 0;
+  line-height: 1; transition: color .1s;
+}
+.q-chip-x:hover { color: #334155; }
+.q-chips-clear {
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; color: #94A3B8; font-weight: 500; padding: 3px 4px;
+  transition: color .1s; align-self: center;
+}
+.q-chips-clear:hover { color: #475569; }
+
+/* ─── History entries (shared) ───────────────── */
+.hist-list { display: flex; flex-direction: column; }
+.hist-entry {
+  display: flex; gap: 10px; padding-bottom: 16px;
+  position: relative;
+}
+.hist-entry:not(:last-child)::after {
+  content: ''; position: absolute; left: 12px; top: 27px; bottom: 0;
+  width: 1px; background: #F1F5F9;
+}
+.hist-icon {
+  width: 25px; height: 25px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hist-icon-ai     { background: #EFF6FF; color: #1D4ED8; }
+.hist-icon-swap   { background: #FFFBEB; color: #92400E; }
+.hist-icon-check  { background: #ECFDF5; color: #059669; }
+.hist-icon-alert  { background: #FFF5F5; color: #DC2626; }
+.hist-icon-action { background: #F8FAFC; color: #475569; }
+.hist-icon-added  { background: #F5F3FF; color: #6D28D9; }
+.hist-icon-send   { background: #EFF6FF; color: #2563EB; }
+.hist-icon-apl    { background: #ECFDF5; color: #059669; }
+.hist-content { flex: 1; min-width: 0; }
+.hist-label  { font-size: 12px; font-weight: 500; color: #334155; line-height: 1.4; }
+.hist-detail { font-size: 11px; color: #64748B; margin-top: 2px; line-height: 1.4; }
+.hist-time   { font-size: 10.5px; color: #CBD5E1; margin-top: 3px; }
+.hist-empty  { font-size: 12px; color: #94A3B8; padding: 16px 0; text-align: center; }
+
+/* History tab panel (mapping screen) */
+.hist-panel-hd    { margin-bottom: 18px; }
+.hist-panel-title { font-size: 12.5px; font-weight: 600; color: #0F172A; margin-bottom: 2px; }
+.hist-panel-sub   { font-size: 11px; color: #94A3B8; }
+
+/* ─── Exceptions history drawer ──────────────── */
+.exc-hist-backdrop {
+  position: absolute; inset: 0; z-index: 50;
+  background: rgba(15,23,42,.1);
+}
+.exc-hist-drawer {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 290px;
+  background: #fff; border-left: 1px solid #E8ECF2;
+  box-shadow: -10px 0 40px rgba(0,0,0,.1);
+  z-index: 51; display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .22s cubic-bezier(.22,1,.36,1);
+}
+.exc-hist-drawer.open { transform: translateX(0); }
+.exc-hist-head {
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid #F1F5F9;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.exc-hist-head-title { font-size: 13px; font-weight: 600; color: #0F172A; }
+.exc-hist-head-sub   { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+.exc-hist-close {
+  background: none; border: none; cursor: pointer;
+  color: #94A3B8; padding: 3px; border-radius: 5px;
+  display: flex; align-items: center;
+  transition: color .12s, background .12s;
+  flex-shrink: 0; margin-left: 8px;
+}
+.exc-hist-close:hover { color: #334155; background: #F1F5F9; }
+.exc-hist-body { padding: 18px; flex: 1; overflow-y: auto; }
+
+/* (exc-detail-title-row removed — history now lives in the right panel tab) */
+
 /* ─── Loading spinner on buttons ────────────── */
 @keyframes btn-spin { to { transform: rotate(360deg); } }
 .btn-spin { animation: btn-spin .65s linear infinite; display: inline-block; }
@@ -1337,25 +1658,39 @@ body {
 <body>
 
 <!-- ═══ Sidebar ═══════════════════════════════════ -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
+
   <div class="sidebar-brand">
     <div class="sidebar-brand-row">
       <div class="brand-icon">CA</div>
-      <span class="brand-name">CMP Autoboot</span>
+      <div class="brand-text">
+        <div class="brand-name">CMP Autoboot</div>
+        <div class="brand-sub">MOG · APL Mapper .v1</div>
+      </div>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="Collapse sidebar">
+        <span class="sidebar-toggle-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </span>
+      </button>
     </div>
-    <div class="brand-sub">MOG · APL Mapper .v1</div>
   </div>
+
   <nav class="sidebar-nav">
-    <div class="nav-item active" id="nav-dashboard" onclick="showDashboard()">
+
+    <!-- Primary nav -->
+    <div class="nav-item active" id="nav-dashboard" data-label="Dashboard" onclick="showDashboard()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <rect x="3" y="3" width="7" height="7" rx="1.5"/>
         <rect x="14" y="3" width="7" height="7" rx="1.5"/>
         <rect x="3" y="14" width="7" height="7" rx="1.5"/>
         <rect x="14" y="14" width="7" height="7" rx="1.5"/>
       </svg>
-      Dashboard
+      <span class="nav-label">Dashboard</span>
     </div>
-    <div class="nav-item" id="nav-worklist" onclick="showWorklist()">
+
+    <div class="nav-item" id="nav-worklist" data-label="Queue List" onclick="showWorklist()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <line x1="9" y1="6" x2="20" y2="6"/>
         <line x1="9" y1="12" x2="20" y2="12"/>
@@ -1364,16 +1699,29 @@ body {
         <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/>
         <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
       </svg>
-      Queue List
+      <span class="nav-label">Queue List</span>
     </div>
-    <div class="nav-item" id="nav-exceptions" onclick="showExceptions()">
+
+    <div class="nav-item" id="nav-exceptions" data-label="Exceptions" onclick="showExceptions()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
         <line x1="12" y1="9" x2="12" y2="13"/>
         <line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
-      Exceptions
+      <span class="nav-label">Exceptions</span>
     </div>
+
+    <div class="nav-divider"></div>
+
+    <!-- Secondary nav -->
+    <div class="nav-item" id="nav-settings" data-label="Settings" onclick="showToast('Settings — coming soon')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span class="nav-label">Settings</span>
+    </div>
+
   </nav>
 </div>
 
@@ -1423,13 +1771,15 @@ body {
       <input class="search-box" id="search-box" type="text"
              placeholder="Search MOG or ingredient…"
              oninput="filterSearch(this.value)">
-      <button class="filter-icon-btn" title="Filter">
+      <button class="filter-icon-btn" id="filter-icon-btn" title="Filter" onclick="toggleFilterPanel(event)" style="position:relative">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
         </svg>
       </button>
     </div>
   </div>
+
+  <div class="q-chips" id="q-chips"></div>
 
   <div class="q-list" id="q-list">
     <!-- Rows rendered by JS via buildQueueRow() + init() -->
@@ -1487,9 +1837,26 @@ body {
       <div class="exc-panel-title">Exceptions</div>
       <div class="exc-ftab-row" id="exc-ftab-row">
         <div class="exc-ftab active" data-filter="all"         onclick="setExcFilter('all')">All <span class="exc-ftab-count" id="exc-count-all">0</span></div>
-        <div class="exc-ftab"        data-filter="open"        onclick="setExcFilter('open')">Open <span class="exc-ftab-count" id="exc-count-open">0</span></div>
+        <div class="exc-ftab"        data-filter="open"        onclick="setExcFilter('open')">Needs Action <span class="exc-ftab-count" id="exc-count-open">0</span></div>
         <div class="exc-ftab"        data-filter="in-progress" onclick="setExcFilter('in-progress')">In Progress <span class="exc-ftab-count" id="exc-count-inprogress">0</span></div>
-        <div class="exc-ftab"        data-filter="resolved"    onclick="setExcFilter('resolved')">Done <span class="exc-ftab-count" id="exc-count-resolved">0</span></div>
+        <div class="exc-ftab"        data-filter="resolved"    onclick="setExcFilter('resolved')">Resolved <span class="exc-ftab-count" id="exc-count-resolved">0</span></div>
+      </div>
+      <div class="exc-type-bar" id="exc-type-bar">
+        <span class="exc-type-bar-label">Type</span>
+        <button class="exc-type-btn" id="exc-type-btn" onclick="toggleExcTypeDropdown(event)">
+          <span id="exc-type-label">All</span>
+          <span class="exc-type-clear-x" onclick="clearExcType(event)">×</span>
+          <span class="btn-chevron">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </button>
+        <div class="exc-type-dropdown" id="exc-type-dropdown">
+          <div class="exc-type-opt active" data-type=""              onclick="setExcTypeFilter(this)"><span class="exc-type-opt-icon"></span>All types</div>
+          <div class="exc-type-opt"        data-type="no-apl"        onclick="setExcTypeFilter(this)"><span class="exc-type-opt-icon"></span>No APL</div>
+          <div class="exc-type-opt"        data-type="data-mismatch" onclick="setExcTypeFilter(this)"><span class="exc-type-opt-icon"></span>Data mismatch</div>
+          <div class="exc-type-opt"        data-type="mapping-failed" onclick="setExcTypeFilter(this)"><span class="exc-type-opt-icon"></span>Mapping failed</div>
+          <div class="exc-type-opt"        data-type="supplier-issue" onclick="setExcTypeFilter(this)"><span class="exc-type-opt-icon"></span>Supplier issue</div>
+        </div>
       </div>
     </div>
     <div class="exc-list" id="exc-list"></div>
@@ -1497,22 +1864,37 @@ body {
 
   <!-- Detail panel -->
   <div class="exc-detail" id="exc-detail">
-    <div class="exc-no-selection">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/>
-        <line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-      <div class="exc-no-sel-title">Select an exception</div>
-      <div class="exc-no-sel-sub">Choose an item from the list to view details</div>
+    <div class="exc-no-selection" id="exc-detail-empty">
+      <div class="exc-no-sel-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <div class="exc-no-sel-title">No exception selected</div>
+      <div class="exc-no-sel-sub">Select an item from the list to view its details</div>
     </div>
   </div>
 
   <!-- Action panel -->
   <div class="exc-action-panel" id="exc-action-panel">
-    <div class="exc-action-topbar">Actions</div>
+    <div class="panel-tabs" style="margin-top:0;padding:0 16px;flex-shrink:0">
+      <div class="p-tab active" id="exc-tab-actions" onclick="switchExcPanelTab(this)">Actions</div>
+      <div class="p-tab"        id="exc-tab-history" onclick="switchExcPanelTab(this)">History</div>
+    </div>
     <div class="exc-action-body" id="exc-action-body">
-      <div class="exc-action-note">Select an exception to see available actions.</div>
+      <div class="exc-no-selection" style="padding:32px 16px">
+        <div class="exc-no-sel-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="exc-no-sel-title">No exception selected</div>
+        <div class="exc-no-sel-sub">Select an exception to see available actions</div>
+      </div>
     </div>
   </div>
 
@@ -1627,6 +2009,87 @@ const DEFAULT_COSTS = {
   'sunflower-oil':   140.00,
   'dried-ginger':    200.00,
 };
+
+/* ─────────────────────────────────────────────────
+   ITEM HISTORY — seed events per item key
+   Entries: { iconType, label, detail, date (ISO) }
+───────────────────────────────────────────────── */
+const ITEM_HISTORY = {
+  'active-dry-yeast': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Pack size mismatch detected by ODS sync',              date:'2026-04-16' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Global Spice Traders ₹80 — saves ₹4 vs current default', date:'2026-04-16' },
+    { iconType:'swap',  label:'Default APL previously set',detail:'Vista Yeast ₹84 — set 3 weeks prior',                 date:'2026-03-28' },
+  ],
+  'baking-soda': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Brand change detected in latest ODS sync',            date:'2026-04-19' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Global Spice Traders ₹80 — saves ₹4',                date:'2026-04-19' },
+  ],
+  'brown-sugar': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Brand change detected in ODS sync',                   date:'2026-04-20' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Spice Route ₹78 — saves ₹6 vs current default',      date:'2026-04-20' },
+  ],
+  'herbal-tea': [
+    { iconType:'alert', label:'Flagged for review',        detail:'No matching supplier found by AI scan',               date:'2026-04-18' },
+    { iconType:'ai',    label:'AI scan completed',         detail:'No high-confidence suggestion available — manual review required', date:'2026-04-18' },
+    { iconType:'swap',  label:'Default APL on record',     detail:'Vista Yeast ₹84 — last verified 2 weeks ago',        date:'2026-04-05' },
+  ],
+  'coconut-flour': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Brand change detected in ODS sync',                   date:'2026-04-17' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Spice Route ₹81 — saves ₹3 vs current default',      date:'2026-04-17' },
+  ],
+  'almond-butter': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Price change detected in APL data',                   date:'2026-04-19' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Global Spice Traders ₹80 — saves ₹4',                date:'2026-04-19' },
+  ],
+  'rock-salt': [
+    { iconType:'added', label:'Added to mapping queue',    detail:'Incremental batch — ODS import Apr 2026',             date:'2026-04-14' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Pure Salt ₹55 — high confidence (94%)',              date:'2026-04-14' },
+    { iconType:'swap',  label:'Default APL previously set',detail:'Himalayan Salt Co. ₹60 — set 2 weeks prior',        date:'2026-04-06' },
+  ],
+  'white-pepper': [
+    { iconType:'added', label:'Added to mapping queue',    detail:'ODS sync detected price change',                      date:'2026-04-13' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Aromatic Spices ₹112 — saves ₹8 vs current',        date:'2026-04-13' },
+  ],
+  'cane-sugar': [
+    { iconType:'added', label:'Added to mapping queue',    detail:'New supplier option identified in ODS',               date:'2026-04-12' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Uttam ₹42 — saves ₹3 vs current default',           date:'2026-04-12' },
+    { iconType:'swap',  label:'Default APL previously set',detail:'Previous change confirmed 3 weeks ago',              date:'2026-03-30' },
+  ],
+  'tapioca-starch': [
+    { iconType:'added', label:'Added to mapping queue',    detail:'No existing APL found for this ingredient',           date:'2026-04-15' },
+    { iconType:'ai',    label:'AI scan completed',         detail:'Multiple options available — manual selection required', date:'2026-04-15' },
+  ],
+  'soy-lecithin': [
+    { iconType:'added', label:'Added to mapping queue',    detail:'Incremental batch addition — Apr 2026',               date:'2026-04-14' },
+    { iconType:'ai',    label:'AI scan completed',         detail:'No existing APL — new supplier assignment needed',   date:'2026-04-14' },
+  ],
+  'xanthan-gum': [
+    { iconType:'added', label:'Added to mapping queue',    detail:'Incremental batch addition — Apr 2026',               date:'2026-04-14' },
+    { iconType:'ai',    label:'AI scan completed',         detail:'4 supplier options identified for review',            date:'2026-04-14' },
+  ],
+  'refined-flour': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Cheaper supplier option detected by ODS',             date:'2026-04-18' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Golden Grain ₹35 — saves ₹3 vs current',            date:'2026-04-18' },
+  ],
+  'sunflower-oil': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Preferred supplier change in procurement records',    date:'2026-04-19' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'Saffola ₹135 — saves ₹5 vs current default',        date:'2026-04-19' },
+  ],
+  'dried-ginger': [
+    { iconType:'alert', label:'Flagged for review',        detail:'Price drop detected in latest APL data',              date:'2026-04-18' },
+    { iconType:'ai',    label:'AI suggestion generated',   detail:'MDH ₹188 — saves ₹12 vs current default',           date:'2026-04-18' },
+  ],
+};
+
+// Runtime log — entries added when mappings are confirmed/rejected
+const itemHistoryLog = {};
+function pushItemHistory(key, event) {
+  if (!itemHistoryLog[key]) itemHistoryLog[key] = [];
+  itemHistoryLog[key].push({ ...event, date: TODAY_OBJ.toISOString().slice(0, 10) });
+}
+function getItemHistory(key) {
+  return [...(ITEM_HISTORY[key] || []), ...(itemHistoryLog[key] || [])];
+}
 
 /* ─────────────────────────────────────────────────
    ITEM DATA STORE
@@ -2299,24 +2762,289 @@ function selectItem(el) {
   renderAction(ITEMS[key]);
 }
 
+/* ─────────────────────────────────────────────────
+   FILTER PANEL — state & helpers
+───────────────────────────────────────────────── */
+const activeFilters = {
+  pendingDays: new Set(),   // 'gt7' | '3to7' | 'lt3'
+  issueType:   new Set(),   // 'pack-mismatch' | 'brand-change' | 'no-suggestion' | 'data-mismatch'
+  costImpact:  new Set(),   // 'high' | 'medium' | 'low' | 'no-change'
+};
+let _fpOutsideHandler = null;
+
+const FILTER_LABELS = {
+  'gt7':          '> 7 days',
+  '3to7':         '3–7 days',
+  'lt3':          '< 3 days',
+  'pack-mismatch':'Pack size mismatch',
+  'brand-change': 'Brand change',
+  'no-suggestion':'No suggestion',
+  'data-mismatch':'Data mismatch',
+  'high':         'High savings',
+  'medium':       'Medium savings',
+  'low':          'Low savings',
+  'no-change':    'No change',
+};
+
+function getItemPendingDays(item) {
+  const m = (item.pending || '').match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+function getItemIssueType(item) {
+  const reason = (item.qRow?.reason || '').toLowerCase();
+  // No supplier / no suggestion cases
+  if (reason.includes('no supplier') || reason.includes('new ingredient') ||
+      reason.includes('discontinued') || reason.includes('re-mapping'))
+    return 'no-suggestion';
+  if (!item.suggested && item.queue === 'red') return 'no-suggestion';
+  // Pack size
+  if (reason.includes('pack') && reason.includes('size')) return 'pack-mismatch';
+  // Data / unit mismatch
+  if (reason.includes('mismatch') || reason.includes('data')) return 'data-mismatch';
+  // Brand / price / transition / AI changes all map to brand-change
+  if (reason.includes('brand') || reason.includes('price') || reason.includes('cost') ||
+      reason.includes('contract') || reason.includes('transition') ||
+      reason.includes('onboarding') || reason.includes('ai confidence') ||
+      reason.includes('equivalent') || reason.includes('lower'))
+    return 'brand-change';
+  if (!item.suggested) return 'no-suggestion';
+  return 'brand-change';
+}
+
+function getItemCostImpact(item) {
+  const saving = item.qRow?.saving || '';
+  const m = saving.match(/₹(\d+)/);
+  if (!m) return 'no-change';
+  const amt = parseInt(m[1], 10);
+  if (amt >= 10) return 'high';
+  if (amt >= 4)  return 'medium';
+  return 'low';
+}
+
+function hasActiveFilters() {
+  return Object.values(activeFilters).some(s => s.size > 0);
+}
+
+/* Build the dropdown panel HTML */
+function buildFilterPanel() {
+  const pDays = activeFilters.pendingDays;
+  const iType = activeFilters.issueType;
+  const cImp  = activeFilters.costImpact;
+
+  function opt(section, value, label) {
+    const checked = activeFilters[section].has(value);
+    const chkSVG  = checked
+      ? `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>`
+      : '';
+    return `<div class="qfp-option${checked ? ' checked' : ''}"
+                 onclick="toggleFilterOption('${section}','${value}');event.stopPropagation()">
+      <div class="qfp-checkbox${checked ? ' on' : ''}">${chkSVG}</div>
+      <span class="qfp-opt-label">${label}</span>
+    </div>`;
+  }
+
+  return `<div class="q-filter-panel" id="q-filter-panel" onclick="event.stopPropagation()">
+    <div class="qfp-section">
+      <div class="qfp-section-title">Pending Duration</div>
+      ${opt('pendingDays','gt7','> 7 days')}
+      ${opt('pendingDays','3to7','3–7 days')}
+      ${opt('pendingDays','lt3','< 3 days')}
+    </div>
+    <div class="qfp-divider"></div>
+    <div class="qfp-section">
+      <div class="qfp-section-title">Issue Type</div>
+      ${opt('issueType','pack-mismatch','Pack size mismatch')}
+      ${opt('issueType','brand-change','Brand change')}
+      ${opt('issueType','no-suggestion','No suggestion')}
+      ${opt('issueType','data-mismatch','Data mismatch')}
+    </div>
+    <div class="qfp-divider"></div>
+    <div class="qfp-section">
+      <div class="qfp-section-title">Cost Impact</div>
+      ${opt('costImpact','high','High savings (≥ ₹10)')}
+      ${opt('costImpact','medium','Medium savings (₹4–9)')}
+      ${opt('costImpact','low','Low savings (< ₹4)')}
+      ${opt('costImpact','no-change','No change')}
+    </div>
+    <div class="qfp-footer">
+      <button class="qfp-clear" onclick="clearAllFilters();event.stopPropagation()">Clear All</button>
+      <button class="qfp-apply" onclick="applyFilters();event.stopPropagation()">Apply Filters</button>
+    </div>
+  </div>`;
+}
+
+function toggleFilterPanel(e) {
+  if (e) e.stopPropagation();
+  const existing = document.getElementById('q-filter-panel');
+  if (existing) { closeFilterPanel(); return; }
+
+  const searchRow = document.querySelector('.search-row');
+  searchRow.insertAdjacentHTML('beforeend', buildFilterPanel());
+
+  // Close on outside click
+  _fpOutsideHandler = (ev) => {
+    const panel = document.getElementById('q-filter-panel');
+    const btn   = document.getElementById('filter-icon-btn');
+    if (panel && !panel.contains(ev.target) && !btn.contains(ev.target)) {
+      closeFilterPanel();
+    }
+  };
+  setTimeout(() => document.addEventListener('click', _fpOutsideHandler), 0);
+}
+
+function closeFilterPanel() {
+  const panel = document.getElementById('q-filter-panel');
+  if (panel) panel.remove();
+  if (_fpOutsideHandler) {
+    document.removeEventListener('click', _fpOutsideHandler);
+    _fpOutsideHandler = null;
+  }
+}
+
+function toggleFilterOption(section, value) {
+  const set = activeFilters[section];
+  if (set.has(value)) set.delete(value); else set.add(value);
+  // Re-render panel in-place
+  const old = document.getElementById('q-filter-panel');
+  if (old) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = buildFilterPanel();
+    old.replaceWith(tmp.firstElementChild);
+  }
+}
+
+function applyFilters() {
+  closeFilterPanel();
+  renderFilterChips();
+  applyQueueFilters();
+  // Update button active state
+  const btn = document.getElementById('filter-icon-btn');
+  if (btn) btn.classList.toggle('active', hasActiveFilters());
+}
+
+function clearAllFilters() {
+  Object.values(activeFilters).forEach(s => s.clear());
+  closeFilterPanel();
+  renderFilterChips();
+  applyQueueFilters();
+  const btn = document.getElementById('filter-icon-btn');
+  if (btn) btn.classList.remove('active');
+}
+
+function renderFilterChips() {
+  const el = document.getElementById('q-chips');
+  if (!el) return;
+
+  const chips = [];
+  Object.entries(activeFilters).forEach(([section, set]) =>
+    set.forEach(val => chips.push({ section, val, label: FILTER_LABELS[val] || val }))
+  );
+
+  if (chips.length === 0) { el.innerHTML = ''; el.style.display = 'none'; return; }
+
+  el.style.display = 'flex';
+  el.innerHTML = chips.map(c => `
+    <div class="q-chip">
+      ${c.label}
+      <button class="q-chip-x" onclick="removeFilterChip('${c.section}','${c.val}')"
+              title="Remove filter">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>`).join('') +
+    `<button class="q-chips-clear" onclick="clearAllFilters()">Clear all</button>`;
+}
+
+function removeFilterChip(section, value) {
+  activeFilters[section].delete(value);
+  renderFilterChips();
+  applyQueueFilters();
+  const btn = document.getElementById('filter-icon-btn');
+  if (btn) btn.classList.toggle('active', hasActiveFilters());
+}
+
+/* Core filter engine — call any time filter state changes */
+function applyQueueFilters() {
+  const activeQueue = document.querySelector('.ftab.active')?.dataset.queue;
+  const searchVal   = (document.getElementById('search-box')?.value || '').trim().toLowerCase();
+  const pDays  = activeFilters.pendingDays;
+  const iType  = activeFilters.issueType;
+  const cImp   = activeFilters.costImpact;
+
+  let firstEl = null;
+  let visible = 0;
+
+  document.querySelectorAll('.q-item').forEach(el => {
+    // Always hide items not in the active queue tab
+    if (el.dataset.queue !== activeQueue) { el.style.display = 'none'; return; }
+
+    const item = ITEMS[el.dataset.key];
+    if (!item) { el.style.display = 'none'; return; }
+
+    // Search
+    if (searchVal) {
+      const hit = item.name.toLowerCase().includes(searchVal)
+               || item.key.replace(/-/g,' ').includes(searchVal);
+      if (!hit) { el.style.display = 'none'; return; }
+    }
+
+    // Pending duration (OR within section)
+    if (pDays.size > 0) {
+      const d = getItemPendingDays(item);
+      const ok = (pDays.has('gt7')  && d > 7)
+              || (pDays.has('3to7') && d >= 3 && d <= 7)
+              || (pDays.has('lt3')  && d < 3);
+      if (!ok) { el.style.display = 'none'; return; }
+    }
+
+    // Issue type (OR within section)
+    if (iType.size > 0) {
+      if (!iType.has(getItemIssueType(item))) { el.style.display = 'none'; return; }
+    }
+
+    // Cost impact (OR within section)
+    if (cImp.size > 0) {
+      if (!cImp.has(getItemCostImpact(item))) { el.style.display = 'none'; return; }
+    }
+
+    el.style.display = '';
+    visible++;
+    if (!firstEl) firstEl = el;
+  });
+
+  const emptyEl = document.getElementById('q-empty');
+  if (emptyEl) {
+    emptyEl.style.display = visible === 0 ? 'block' : 'none';
+    if (visible === 0 && hasActiveFilters()) {
+      emptyEl.innerHTML = `
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        No items match the active filters`;
+    } else if (visible === 0) {
+      emptyEl.innerHTML = `
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        No items match your search`;
+    }
+  }
+
+  return firstEl;
+}
+
 function filterQueue(queue) {
   // Update tab active state
   document.querySelectorAll('.ftab').forEach(t =>
     t.classList.toggle('active', t.dataset.queue === queue)
   );
-  // Show/hide rows
-  let firstEl = null;
-  let visible = 0;
-  document.querySelectorAll('.q-item').forEach(item => {
-    const show = item.dataset.queue === queue;
-    item.style.display = show ? '' : 'none';
-    item.classList.remove('selected');
-    if (show) { visible++; if (!firstEl) firstEl = item; }
-  });
-  document.getElementById('q-empty').style.display = visible === 0 ? 'block' : 'none';
   document.getElementById('search-box').value = '';
+  document.querySelectorAll('.q-item').forEach(el => el.classList.remove('selected'));
 
-  // Auto-select first item
+  const firstEl = applyQueueFilters();
+
   if (firstEl) {
     firstEl.classList.add('selected');
     const key = firstEl.dataset.key;
@@ -2329,13 +3057,11 @@ function filterQueue(queue) {
       reviewMode      = false;
       savedSelections = [];
       savedDefaultId  = null;
-      // RED items: auto-enter edit (assign) mode
       if (ITEMS[key].queue === 'red') editMode = true;
       renderDetail(ITEMS[key]);
       renderAction(ITEMS[key]);
     }
   } else {
-    // Empty queue
     document.getElementById('detail-title').textContent = 'No items';
     document.getElementById('detail-status').textContent = '';
     document.getElementById('detail-breadcrumb').innerHTML = '';
@@ -2352,17 +3078,7 @@ function filterQueue(queue) {
 }
 
 function filterSearch(val) {
-  const q = val.trim().toLowerCase();
-  const activeQueue = document.querySelector('.ftab.active').dataset.queue;
-  let visible = 0;
-  document.querySelectorAll('.q-item').forEach(item => {
-    if (item.dataset.queue !== activeQueue) return;
-    const match = !q || item.dataset.key.replace(/-/g,' ').includes(q)
-                     || (ITEMS[item.dataset.key]?.name || '').toLowerCase().includes(q);
-    item.style.display = match ? '' : 'none';
-    if (match) visible++;
-  });
-  document.getElementById('q-empty').style.display = visible === 0 ? 'block' : 'none';
+  applyQueueFilters();
 }
 
 /* Toggle extra APL cards */
@@ -2572,6 +3288,8 @@ function confirmMapping() {
     defaultId = item.currentAPLs.find(a => a.isDefault)?.id || null;
   }
   confirmedItems[key] = { apls, defaultId };
+  const defaultBrand  = apls.find(a => a.id === defaultId)?.brand || 'Unknown';
+  pushItemHistory(key, { iconType:'check', label:'Mapping confirmed', detail:`Default set to ${defaultBrand}` });
 
   // ── 2. Clear review / edit state ───────────────────
   reviewMode      = false;
@@ -3537,6 +4255,8 @@ function keepCurrentAPL() {
                   || item.currentAPLs[0]?.id
                   || null;
   confirmedItems[key] = { apls, defaultId };
+  const defaultBrand2  = apls.find(a => a.id === defaultId)?.brand || 'Current APL';
+  pushItemHistory(key, { iconType:'check', label:'Mapping confirmed', detail:`Keeping ${defaultBrand2} as default` });
 
   item.statusTag = 'Mapped';
   const qRow = document.querySelector(`.q-item[data-key="${key}"]`);
@@ -3596,6 +4316,72 @@ function clearRedSelections() {
 function switchPanelTab(el) {
   document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+  if (el.textContent.trim() === 'History') {
+    renderMappingHistory(currentKey);
+  } else {
+    if (currentKey) renderAction(ITEMS[currentKey]);
+    else document.getElementById('action-body').innerHTML = '';
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   HISTORY — shared helpers
+───────────────────────────────────────────────── */
+function relativeTime(isoDate) {
+  const d    = new Date(isoDate);
+  const diff = Math.round((TODAY_OBJ - d) / 86400000);
+  if (diff <= 0) return 'Today';
+  if (diff === 1) return '1 day ago';
+  if (diff <  7) return `${diff} days ago`;
+  if (diff < 14) return '1 week ago';
+  if (diff < 60) return `${Math.floor(diff / 7)} weeks ago`;
+  return `${Math.floor(diff / 30)} months ago`;
+}
+
+function histIconSVG(type) {
+  const icons = {
+    ai:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+    swap:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`,
+    check:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`,
+    alert:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+    action: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`,
+    added:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+    send:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+    apl:    `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
+  };
+  return icons[type] || icons.action;
+}
+
+function buildHistoryHTML(events) {
+  if (!events || events.length === 0) {
+    return `<div class="hist-empty">No history recorded yet</div>`;
+  }
+  return `<div class="hist-list">${events.slice(0, 5).map(ev => `
+    <div class="hist-entry">
+      <div class="hist-icon hist-icon-${ev.iconType}">${histIconSVG(ev.iconType)}</div>
+      <div class="hist-content">
+        <div class="hist-label">${ev.label}</div>
+        ${ev.detail ? `<div class="hist-detail">${ev.detail}</div>` : ''}
+        <div class="hist-time">${relativeTime(ev.date)}</div>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderMappingHistory(key) {
+  const body = document.getElementById('action-body');
+  if (!key) {
+    body.innerHTML = `<div class="hist-empty">Select an item to view history</div>`;
+    return;
+  }
+  const item   = ITEMS[key];
+  const events = getItemHistory(key);
+  body.innerHTML = `
+    <div class="hist-panel-hd">
+      <div class="hist-panel-title">${item ? item.name : 'Item'}</div>
+      <div class="hist-panel-sub">${events.length} event${events.length !== 1 ? 's' : ''} recorded</div>
+    </div>
+    ${buildHistoryHTML(events)}`;
 }
 
 /* ─────────────────────────────────────────────────
@@ -3940,8 +4726,54 @@ const EXCEPTIONS = {
   }
 };
 
+/* ─────────────────────────────────────────────────
+   EXCEPTION HISTORY — seed events + runtime log
+───────────────────────────────────────────────── */
+const EXC_HISTORY = {
+  'exc-guar-gum': [
+    { iconType:'alert',  label:'Exception raised',        detail:'No APL found during ODS sync',                               date:'2026-04-11' },
+    { iconType:'ai',     label:'Issue identified',         detail:'No APL registered for this ingredient at Mumbai MUM-PR-07',  date:'2026-04-11' },
+    { iconType:'added',  label:'Added to exceptions queue',detail:'Assigned for manual review',                                 date:'2026-04-12' },
+  ],
+  'exc-carrageenan': [
+    { iconType:'alert',  label:'Exception raised',        detail:'Supplier discontinued detected in ODS sync',                  date:'2026-04-12' },
+    { iconType:'ai',     label:'Issue identified',         detail:'NutriCorp India marked inactive — no active replacement',    date:'2026-04-12' },
+    { iconType:'added',  label:'Added to exceptions queue',detail:'Flagged as critical — zero active suppliers',                date:'2026-04-13' },
+  ],
+  'exc-citric-acid': [
+    { iconType:'alert',  label:'Exception raised',        detail:'Pack size mismatch detected in data sync',                    date:'2026-04-14' },
+    { iconType:'ai',     label:'Issue identified',         detail:'MOG: 25 kg · APL: 10 kg — cannot auto-map',                 date:'2026-04-14' },
+  ],
+  'exc-malt-extract': [
+    { iconType:'alert',  label:'Exception raised',        detail:'Automated mapping returned an error',                         date:'2026-04-15' },
+    { iconType:'ai',     label:'Issue identified',         detail:'Supplier code format mismatch after vendor consolidation',    date:'2026-04-15' },
+  ],
+  'exc-potato-starch': [
+    { iconType:'alert',  label:'Exception raised',        detail:'No APL found for Pune warehouse during sync',                 date:'2026-04-17' },
+    { iconType:'ai',     label:'Issue identified',         detail:'Pune warehouse APL setup incomplete for Starches category',  date:'2026-04-17' },
+  ],
+  'exc-lecithin-soy': [
+    { iconType:'alert',  label:'Exception raised',        detail:'Unit of measure conflict detected: g vs kg',                  date:'2026-04-12' },
+    { iconType:'ai',     label:'Issue identified',         detail:'MOG: grams · APL: kilograms — cannot auto-map',             date:'2026-04-12' },
+    { iconType:'action', label:'Procurement confirmed',    detail:'kg confirmed as the correct unit of measure',                date:'2026-04-18' },
+    { iconType:'check',  label:'Exception resolved',       detail:'APL updated — mapping will proceed normally',               date:'2026-04-19' },
+  ],
+};
+
+const excHistoryLog = {};
+
+function pushExcHistory(key, event) {
+  if (!excHistoryLog[key]) excHistoryLog[key] = [];
+  excHistoryLog[key].push({ ...event, date: TODAY_OBJ.toISOString().slice(0, 10) });
+}
+
+function getExcHistory(key) {
+  return [...(EXC_HISTORY[key] || []), ...(excHistoryLog[key] || [])];
+}
+
 let currentExcKey = null;
 let excFilter = 'all';
+let excTypeFilter = '';  // '' = all types
 
 const EXC_BADGE_CLASS = {
   'no-apl':        'exc-b-no-apl',
@@ -3979,6 +4811,14 @@ function showExceptions() {
   document.getElementById('nav-exceptions').classList.add('active');
 }
 
+function toggleSidebar() {
+  const sb  = document.getElementById('sidebar');
+  const btn = sb.querySelector('.sidebar-toggle');
+  const isCollapsing = !sb.classList.contains('collapsed');
+  sb.classList.toggle('collapsed');
+  btn.title = isCollapsing ? 'Expand sidebar' : 'Collapse sidebar';
+}
+
 function showDashboard() {
   renderDashboard();
   document.getElementById('dashboard-view').style.display    = 'flex';
@@ -4002,6 +4842,57 @@ function setExcFilter(filter) {
   renderExceptionsList();
 }
 
+function toggleExcTypeDropdown(e) {
+  e.stopPropagation();
+  const btn  = document.getElementById('exc-type-btn');
+  const drop = document.getElementById('exc-type-dropdown');
+  const isOpen = drop.classList.contains('open');
+  drop.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+
+function setExcTypeFilter(el) {
+  excTypeFilter = el.dataset.type;
+  const label = excTypeFilter
+    ? el.textContent.trim().replace(/^●\s*/, '')
+    : 'All';
+  document.getElementById('exc-type-label').textContent = label;
+  const btn = document.getElementById('exc-type-btn');
+  btn.classList.toggle('has-filter', !!excTypeFilter);
+  btn.classList.remove('open');
+  document.getElementById('exc-type-dropdown').classList.remove('open');
+  document.querySelectorAll('.exc-type-opt').forEach(o =>
+    o.classList.toggle('active', o.dataset.type === excTypeFilter));
+  renderExceptionsList();
+}
+
+function clearExcType(e) {
+  e.stopPropagation();
+  const allOpt = document.querySelector('.exc-type-opt[data-type=""]');
+  if (allOpt) setExcTypeFilter(allOpt);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const drop = document.getElementById('exc-type-dropdown');
+  const btn  = document.getElementById('exc-type-btn');
+  if (drop && !drop.contains(e.target) && btn && !btn.contains(e.target)) {
+    drop.classList.remove('open');
+    btn.classList.remove('open');
+  }
+});
+
+function excMatchesTypeFilter(exc) {
+  if (!excTypeFilter) return true;
+  const typeMap = {
+    'no-apl':         'no-apl',
+    'data-mismatch':  'data-mismatch',
+    'mapping-failed': 'mapping-failed',
+    'supplier-issue': 'discontinued',
+  };
+  return exc.issueType === typeMap[excTypeFilter];
+}
+
 function renderExceptionsList() {
   const all        = Object.values(EXCEPTIONS).sort((a,b) => excSortScore(b) - excSortScore(a));
   const open       = all.filter(e => e.status === 'open');
@@ -4013,10 +4904,11 @@ function renderExceptionsList() {
   document.getElementById('exc-count-inprogress').textContent = inProgress.length;
   document.getElementById('exc-count-resolved').textContent   = resolved.length;
 
-  const filtered = excFilter === 'open'        ? open
+  const byStatus = excFilter === 'open'        ? open
                  : excFilter === 'in-progress'  ? inProgress
                  : excFilter === 'resolved'     ? resolved
                  : all;
+  const filtered = byStatus.filter(excMatchesTypeFilter);
 
   const list = document.getElementById('exc-list');
   list.innerHTML = filtered.map(exc => {
@@ -4046,6 +4938,84 @@ function excDetailField(label, value) {
   </div>`;
 }
 
+/* ─────────────────────────────────────────────────
+   EXCEPTION ACTION PANEL — tab switcher + renderers
+───────────────────────────────────────────────── */
+function switchExcPanelTab(el) {
+  el.closest('.panel-tabs').querySelectorAll('.p-tab')
+    .forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const tab = el.textContent.trim();
+  if (tab === 'History') renderExcHistory(currentExcKey);
+  else                   renderExcActions(currentExcKey);
+}
+
+function renderExcActions(key) {
+  const body = document.getElementById('exc-action-body');
+  if (!key) { body.innerHTML = `<div class="exc-action-note">Select an exception to see available actions.</div>`; return; }
+  const exc        = EXCEPTIONS[key];
+  const isResolved = exc.status === 'resolved';
+  const isInProg   = exc.status === 'in-progress';
+
+  if (isResolved) {
+    body.innerHTML = `
+      <div class="exc-action-note" style="color:#059669;font-weight:500;display:flex;align-items:center;gap:5px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+        Exception resolved
+      </div>
+      <div class="exc-action-divider"></div>
+      <button class="exc-action-btn exc-btn-ghost" onclick="reopenException('${key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+        Reopen exception
+      </button>`;
+  } else if (isInProg) {
+    body.innerHTML = `
+      <div class="exc-action-note" style="color:#1D4ED8;font-weight:500;display:flex;align-items:center;gap:5px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        In mapping queue
+      </div>
+      <div class="exc-action-note" style="margin-top:-2px">Pending manual review in the Red queue.</div>
+      <div class="exc-action-divider"></div>
+      <button class="exc-action-btn exc-btn-primary" onclick="resolveException('${key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark as Resolved
+      </button>
+      <button class="exc-action-btn exc-btn-ghost" onclick="reopenException('${key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+        Recall from queue
+      </button>`;
+  } else {
+    body.innerHTML = `
+      <button class="exc-action-btn exc-btn-primary" onclick="sendExcToQueue('${key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send to Mapping Queue
+      </button>
+      <button class="exc-action-btn exc-btn-secondary" onclick="createAplForException('${key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create New APL
+      </button>
+      <div class="exc-action-divider"></div>
+      <button class="exc-action-btn exc-btn-ghost" onclick="resolveException('${key}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark as Resolved
+      </button>
+      <div class="exc-action-note">Sending to queue adds this item to the Red queue for manual supplier assignment.</div>`;
+  }
+}
+
+function renderExcHistory(key) {
+  const body = document.getElementById('exc-action-body');
+  if (!key) { body.innerHTML = `<div class="hist-empty">Select an exception to view history</div>`; return; }
+  const exc    = EXCEPTIONS[key];
+  const events = getExcHistory(key);
+  body.innerHTML = `
+    <div class="hist-panel-hd">
+      <div class="hist-panel-title">${exc?.name || 'Exception'}</div>
+      <div class="hist-panel-sub">${events.length} event${events.length !== 1 ? 's' : ''} recorded</div>
+    </div>
+    ${buildHistoryHTML(events)}`;
+}
+
 function selectException(key) {
   currentExcKey = key;
   renderExceptionsList();
@@ -4055,6 +5025,10 @@ function selectException(key) {
   const status     = exc.status;
   const isResolved = status === 'resolved';
   const isInProg   = status === 'in-progress';
+
+  // ── Reset panel tab to Actions whenever a new item is selected ──
+  document.getElementById('exc-tab-actions')?.classList.add('active');
+  document.getElementById('exc-tab-history')?.classList.remove('active');
 
   // ── Detail panel ──
   const recBlock = isResolved
@@ -4115,58 +5089,14 @@ function selectException(key) {
       ${recBlock}
     </div>`;
 
-  // ── Action panel ──
-  const actionBody = document.getElementById('exc-action-body');
-  if (isResolved) {
-    actionBody.innerHTML = `
-      <div class="exc-action-note" style="color:#059669;font-weight:500;display:flex;align-items:center;gap:5px">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-        Exception resolved
-      </div>
-      <div class="exc-action-divider"></div>
-      <button class="exc-action-btn exc-btn-ghost" onclick="reopenException('${exc.key}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
-        Reopen exception
-      </button>`;
-  } else if (isInProg) {
-    actionBody.innerHTML = `
-      <div class="exc-action-note" style="color:#1D4ED8;font-weight:500;display:flex;align-items:center;gap:5px">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        In mapping queue
-      </div>
-      <div class="exc-action-note" style="margin-top:-2px">Pending manual review in the Red queue.</div>
-      <div class="exc-action-divider"></div>
-      <button class="exc-action-btn exc-btn-primary" onclick="resolveException('${exc.key}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Mark as Resolved
-      </button>
-      <button class="exc-action-btn exc-btn-ghost" onclick="reopenException('${exc.key}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
-        Recall from queue
-      </button>`;
-  } else {
-    // Open — primary: Send to Queue, secondary: Create APL, ghost: Mark Resolved
-    actionBody.innerHTML = `
-      <button class="exc-action-btn exc-btn-primary" onclick="sendExcToQueue('${exc.key}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Send to Mapping Queue
-      </button>
-      <button class="exc-action-btn exc-btn-secondary" onclick="createAplForException('${exc.key}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Create New APL
-      </button>
-      <div class="exc-action-divider"></div>
-      <button class="exc-action-btn exc-btn-ghost" onclick="resolveException('${exc.key}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Mark as Resolved
-      </button>
-      <div class="exc-action-note">Sending to queue adds this item to the Red queue for manual supplier assignment.</div>`;
-  }
+  // ── Action panel — always start on Actions tab ──
+  renderExcActions(key);
 }
 
 function resolveException(key) {
   EXCEPTIONS[key].status = 'resolved';
   EXCEPTIONS[key].resolvedDate = TODAY_OBJ.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  pushExcHistory(key, { iconType:'check', label:'Marked as resolved', detail:`Resolved on ${EXCEPTIONS[key].resolvedDate}` });
   selectException(key);
   renderExceptionsList();
   showToast('Exception marked as resolved');
@@ -4175,6 +5105,7 @@ function resolveException(key) {
 function reopenException(key) {
   EXCEPTIONS[key].status = 'open';
   delete EXCEPTIONS[key].resolvedDate;
+  pushExcHistory(key, { iconType:'alert', label:'Exception reopened', detail:'Returned to Open status for further review' });
   selectException(key);
   renderExceptionsList();
   showToast('Exception reopened');
@@ -4182,6 +5113,7 @@ function reopenException(key) {
 
 function sendExcToQueue(key) {
   EXCEPTIONS[key].status = 'in-progress';
+  pushExcHistory(key, { iconType:'send', label:'Sent to Mapping Queue', detail:'Added to Red queue for manual supplier assignment' });
   selectException(key);
   renderExceptionsList();
   showToast(`${EXCEPTIONS[key].name} added to Red queue for mapping`);
@@ -4189,6 +5121,53 @@ function sendExcToQueue(key) {
 
 function createAplForException(key) {
   openCreateAplModal(key);
+}
+
+function openExcHistoryDrawer(key) {
+  const exc = EXCEPTIONS[key];
+  if (!exc) return;
+  closeExcHistoryDrawer(false); // remove any stale drawer instantly
+
+  const container = document.getElementById('exceptions-view');
+  const events    = getExcHistory(key);
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'exc-hist-backdrop';
+  backdrop.id = 'exc-hist-backdrop';
+  backdrop.onclick = () => closeExcHistoryDrawer();
+
+  const drawer = document.createElement('div');
+  drawer.className = 'exc-hist-drawer';
+  drawer.id = 'exc-hist-drawer';
+  drawer.innerHTML = `
+    <div class="exc-hist-head">
+      <div>
+        <div class="exc-hist-head-title">History</div>
+        <div class="exc-hist-head-sub">${exc.name} &middot; ${events.length} event${events.length !== 1 ? 's' : ''}</div>
+      </div>
+      <button class="exc-hist-close" onclick="closeExcHistoryDrawer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="exc-hist-body">${buildHistoryHTML(events)}</div>`;
+
+  container.appendChild(backdrop);
+  container.appendChild(drawer);
+  // Double rAF ensures transition fires after element is painted
+  requestAnimationFrame(() => requestAnimationFrame(() => drawer.classList.add('open')));
+}
+
+function closeExcHistoryDrawer(animate) {
+  const drawer   = document.getElementById('exc-hist-drawer');
+  const backdrop = document.getElementById('exc-hist-backdrop');
+  if (!drawer) return;
+  if (animate === false) {
+    drawer.remove(); if (backdrop) backdrop.remove(); return;
+  }
+  drawer.classList.remove('open');
+  setTimeout(() => { drawer.remove(); if (backdrop) backdrop.remove(); }, 250);
 }
 
 function openCreateAplModal(excKey) {
@@ -4352,6 +5331,8 @@ function submitCreateApl(excKey) {
     EXCEPTIONS[excKey].status      = 'resolved';
     EXCEPTIONS[excKey].resolvedDate = TODAY_OBJ.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
     EXCEPTIONS[excKey].createdApl   = newApl;
+    pushExcHistory(excKey, { iconType:'apl',   label:'New APL created',    detail:`${supplier} · ${pack}${unit} · ₹${cost.toFixed(2)}` });
+    pushExcHistory(excKey, { iconType:'check',  label:'Exception resolved', detail:`Resolved on ${EXCEPTIONS[excKey].resolvedDate}` });
 
     closeCreateAplModal();
     selectException(excKey);

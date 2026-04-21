@@ -194,43 +194,56 @@ body {
 .q-list { overflow-y: auto; flex: 1; }
 
 .q-item {
-  padding: 12px 14px 12px 18px;
+  padding: 11px 14px 11px 18px;
   border-bottom: 1px solid #F4F6F9;
   cursor: pointer; position: relative;
   transition: background .1s;
 }
 .q-item::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px; border-radius: 0 2px 2px 0;
-  opacity: .5;
+  width: 3px; border-radius: 0 2px 2px 0; opacity: .5;
 }
 .q-item.c-amber::before { background: #F59E0B; }
 .q-item.c-red::before   { background: #EF4444; }
 .q-item.c-blue::before  { background: #3B82F6; }
 .q-item.c-green::before { background: #10B981; }
-
-/* Hover */
-.q-item:hover { background: #FAFBFC; }
-
-/* Selected — light grey bg + full-opacity queue accent, no color override */
-.q-item.selected { background: #F8FAFC; }
-.q-item.selected::before { opacity: 1; width: 3px; }
+.q-item:hover     { background: #FAFBFC; }
+.q-item.selected  { background: #F8FAFC; }
+.q-item.selected::before { opacity: 1; }
 
 /* Row text */
 .q-name {
-  font-size: 12.5px; font-weight: 600; color: #0F172A;
-  margin-bottom: 2px;
+  font-size: 13px; font-weight: 700; color: #0F172A;
+  margin-bottom: 1px;
   display: flex; align-items: center; gap: 6px;
 }
-.q-loc  { font-size: 10.5px; color: #94A3B8; margin-bottom: 7px; }
-.q-apl-block { display: flex; flex-direction: column; gap: 3px; margin-bottom: 5px; }
-.q-apl-line  { font-size: 11px; color: #64748B; display: flex; align-items: baseline; gap: 4px; }
-.q-apl-line strong { color: #0F172A; font-weight: 500; }
+.q-loc  { font-size: 10px; color: #94A3B8; margin-bottom: 7px; letter-spacing: .1px; }
+
+/* APL info block */
+.q-apl-block { display: flex; flex-direction: column; gap: 4px; }
+.q-apl-line  {
+  font-size: 11px; color: #64748B;
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+}
+.q-apl-line strong { color: #0F172A; font-weight: 600; }
 .q-apl-tag   { font-size: 9.5px; color: #94A3B8; }
 .q-more-opts { font-size: 10px; color: #94A3B8; }
 .q-no-suggest{ font-size: 11px; color: #CBD5E1; font-style: italic; }
-.q-saving    { font-size: 10.5px; color: #16A34A; font-weight: 500; display: flex; align-items: center; gap: 3px; margin-bottom: 3px; }
-.q-reason    { font-size: 10.5px; color: #CBD5E1; }
+/* "+N APLs" inline badge on the current APL line */
+.q-apl-count {
+  margin-left: auto;
+  font-size: 9px; font-weight: 700; color: #2563EB;
+  background: #EFF6FF; border: 1px solid #BFDBFE;
+  border-radius: 5px; padding: 1px 6px;
+  white-space: nowrap; flex-shrink: 0;
+  letter-spacing: .2px;
+}
+.q-saving {
+  font-size: 10px; color: #16A34A; font-weight: 600;
+  display: flex; align-items: center; gap: 3px;
+  margin-top: 5px;
+}
+.q-reason { display: none; }   /* hidden — info surfaced in detail panel */
 .q-badge {
   display: inline-flex; align-items: center; justify-content: center;
   background: #F1F5F9; color: #64748B;
@@ -274,24 +287,36 @@ body {
 .rec-card {
   background: #F8FAFC; border: 1px solid #E8ECF2;
   border-left: 3px solid #94A3B8;
-  border-radius: 8px; padding: 14px 16px;
+  border-radius: 10px; padding: 14px 16px;
   display: flex; align-items: flex-start; gap: 13px;
   margin-bottom: 24px;
+}
+/* Purple gradient "Recommended Action" banner — amber queue items */
+.rec-card.rc-amber {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 65%, #F0F9FF 100%);
+  border: 1px solid #DDD6FE; border-left: none;
 }
 .rec-card.rc-green { border-left-color: #10B981; }
 .rec-card.rc-red   { border-left-color: #EF4444; }
 .rec-card.rc-blue  { border-left-color: #3B82F6; }
 .rec-icon {
-  width: 28px; height: 28px; flex-shrink: 0;
-  background: #EEF2F7; border-radius: 7px;
+  width: 32px; height: 32px; flex-shrink: 0;
+  border-radius: 8px;
   display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  background: #EEF2F7;
 }
+.rec-card.rc-amber .rec-icon { background: rgba(139,92,246,.14); }
+.rec-card.rc-red   .rec-icon { background: rgba(239,68,68,.1); }
+.rec-card.rc-blue  .rec-icon { background: rgba(59,130,246,.1); }
 .rec-label {
-  font-size: 10px; font-weight: 600; color: #64748B;
-  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px;
+  font-size: 9.5px; font-weight: 700; color: #64748B;
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 4px;
 }
-.rec-heading { font-size: 13px; font-weight: 600; color: #0F172A; margin-bottom: 3px; }
-.rec-sub { font-size: 12px; color: #64748B; }
+.rec-card.rc-amber .rec-label { color: #7C3AED; }
+.rec-heading { font-size: 13.5px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
+.rec-card.rc-amber .rec-heading { color: #1E1B4B; }
+.rec-sub { font-size: 12px; color: #64748B; line-height: 1.5; }
+.rec-card.rc-amber .rec-sub { color: #5B21B6; }
 
 /* APL columns */
 .apl-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
@@ -300,68 +325,111 @@ body {
   text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px;
 }
 
-/* APL cards */
+/* ─── APL cards — 2-row compact layout ─────────── */
 .apl-card {
-  background: #ffffff; border: 1px solid #E8ECF2;
-  border-radius: 9px; padding: 15px 15px 13px; margin-bottom: 9px;
+  background: #fff; border: 1px solid #E8ECF2;
+  border-radius: 9px; padding: 10px 13px 10px;
+  margin-bottom: 7px;
+  display: flex; flex-direction: column; gap: 7px;
+  transition: border-color .12s;
 }
-.apl-card.default-apl { border-left: 3px solid #86EFAC; }
-.apl-card.suggested-card { background: #F8FEFF; border-color: #BAE6FD; }
+.apl-card:hover { border-color: #CBD5E1; }
+.apl-card.default-apl {
+  border-color: #BBF7D0; border-left: 3px solid #16A34A;
+  padding-left: 11px;
+}
+.apl-card.suggested-card {
+  background: #F0F9FF; border: 1.5px solid #7DD3FC;
+}
 .apl-extra { display: none; }
-.apl-extra.visible { display: block; animation: revealCard .16s ease; }
+.apl-extra.visible { display: flex; flex-direction: column; animation: revealCard .16s ease; }
 @keyframes revealCard { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
-.card-header { display: flex; align-items: center; gap: 7px; margin-bottom: 13px; }
+/* Row 1: APL ID tag + badges */
+.card-header {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
 .apl-tag {
   padding: 2px 7px; border-radius: 4px;
-  font-size: 10px; font-weight: 600;
+  font-size: 9.5px; font-weight: 600;
   font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; letter-spacing: .2px;
+  white-space: nowrap;
 }
 .apl-tag-light   { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
 .apl-tag-suggest { background: #DBEAFE; color: #1D4ED8; border: 1px solid #BFDBFE; }
 
-.badge-default {
-  margin-left: auto; padding: 2px 8px;
-  background: #F1F5F9; border: 1px solid #CBD5E1;
-  border-radius: 20px; font-size: 9.5px; font-weight: 600; color: #475569;
+/* Row 2: Brand · Size · Price · Active */
+.card-body {
+  display: flex; align-items: center; gap: 10px;
 }
-.badge-new {
-  margin-left: auto; padding: 2px 8px;
-  background: #DCFCE7; border: 1px solid #BBF7D0;
-  border-radius: 20px; font-size: 9.5px; font-weight: 600; color: #14532D;
+.apl-brand {
+  flex: 1; min-width: 0;
+  font-size: 13px; font-weight: 700; color: #0F172A;
+  letter-spacing: -.1px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
 }
-.badge-diff {
-  padding: 2px 8px; background: #F8FAFC; border: 1px solid #E2E8F0;
-  border-radius: 20px; font-size: 9.5px; color: #64748B;
+.apl-card.suggested-card .apl-brand {
+  font-size: 14px; white-space: normal;
 }
-.badge-trans {
-  padding: 2px 8px; background: #EFF6FF; border: 1px solid #BFDBFE;
-  border-radius: 20px; font-size: 9.5px; color: #1D4ED8;
+.apl-size-price {
+  display: flex; align-items: baseline; gap: 5px; flex-shrink: 0;
 }
-.star { color: #FBBF24; font-size: 13px; line-height: 1; }
+.apl-size  { font-size: 11px; color: #94A3B8; font-weight: 500; }
+.apl-price { font-size: 13px; font-weight: 700; color: #0F172A; }
+.cost-compare { font-size: 9.5px; color: #94A3B8; display: block; margin-top: 1px; text-align: right; }
 
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.field-label {
-  font-size: 9.5px; color: #CBD5E1; text-transform: uppercase;
-  font-weight: 500; letter-spacing: .5px; display: block; margin-bottom: 2px;
-}
-.field-value { font-size: 13px; font-weight: 600; color: #0F172A; display: block; }
-.field-row { margin-top: 12px; }
-.cost-compare { font-size: 10.5px; color: #94A3B8; margin-top: 3px; display: block; }
-
+/* Status Active badge */
 .status-tag {
-  display: inline-block; padding: 2px 9px;
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; padding: 2px 9px;
   background: #F0FDF4; color: #15803D;
   border: 1px solid #DCFCE7; border-radius: 20px;
-  font-size: 10px; font-weight: 500; margin-top: 12px;
+  font-size: 9.5px; font-weight: 600;
 }
+
+/* Badges */
+.star { color: #FBBF24; font-size: 11px; line-height: 1; flex-shrink: 0; }
+.badge-default {
+  margin-left: auto; flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px;
+  background: #F0FDF4; border: 1px solid #BBF7D0;
+  border-radius: 20px; font-size: 9px; font-weight: 700; color: #15803D;
+}
+.badge-new {
+  flex-shrink: 0; padding: 2px 7px;
+  background: #DCFCE7; border: 1px solid #BBF7D0;
+  border-radius: 20px; font-size: 9px; font-weight: 700; color: #14532D;
+}
+.badge-diff {
+  flex-shrink: 0; padding: 2px 8px;
+  background: #FFF7ED; border: 1px solid #FED7AA;
+  border-radius: 20px; font-size: 9px; font-weight: 700; color: #C2410C;
+}
+.badge-trans {
+  flex-shrink: 0; padding: 2px 8px;
+  background: #EFF6FF; border: 1px solid #BFDBFE;
+  border-radius: 20px; font-size: 9px; color: #1D4ED8;
+}
+
+/* Suggested card extra rows */
+.field-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px;
+}
+.field-label {
+  font-size: 9px; color: #CBD5E1; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .5px; display: block; margin-bottom: 3px;
+}
+.field-value { font-size: 13px; font-weight: 700; color: #0F172A; display: block; }
+.field-row { margin-top: 0; }
+.card-footer { display: flex; align-items: center; justify-content: flex-end; }
+
 .savings-pill {
   display: flex; align-items: center; gap: 5px;
   color: #15803D; font-size: 11.5px; font-weight: 500;
   background: #F0FDF4; border: 1px solid #DCFCE7;
-  border-radius: 6px; padding: 5px 9px; margin-top: 12px;
+  border-radius: 6px; padding: 5px 10px; margin-top: 8px;
 }
-.will-add { font-size: 10.5px; color: #94A3B8; margin-top: 6px; font-style: italic; }
+.will-add { font-size: 10.5px; color: #64748B; margin-top: 5px; }
 
 .view-all-btn {
   width: 100%; padding: 8px 12px;
@@ -1086,19 +1154,20 @@ body {
   overflow: hidden;
 }
 .exc-panel-header {
-  padding: 16px 14px 12px;
+  padding: 14px 12px 11px;
   border-bottom: 1px solid #F1F5F9;
-  position: sticky; top: 0; z-index: 10;
+  flex-shrink: 0;
   background: #fff;
 }
 .exc-panel-title {
   font-size: 13px; font-weight: 600; color: #0F172A;
   margin-bottom: 12px; letter-spacing: -.1px;
 }
-.exc-ftab-row { display: flex; gap: 3px; flex-wrap: nowrap; }
+.exc-ftab-row { display: flex; gap: 3px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 1px; }
+.exc-ftab-row::-webkit-scrollbar { display: none; }
 .exc-ftab {
-  padding: 4px 8px; border-radius: 20px;
-  font-size: 10.5px; font-weight: 500; cursor: pointer;
+  padding: 4px 7px; border-radius: 20px;
+  font-size: 10px; font-weight: 500; cursor: pointer;
   color: #94A3B8; background: #F8FAFC;
   border: 1.5px solid transparent;
   display: flex; align-items: center; gap: 4px;
@@ -2346,30 +2415,42 @@ function buildQueueRow(item) {
   const r = item.qRow;
   const qc = item.queue;
 
+  // APL count — shown inline on the Current line
+  const totalAPLs = (item.currentAPLs || []).length + (item.extraAPLs || []).length;
+  const aplCountBadge = totalAPLs > 0
+    ? `<span class="q-apl-count">+${totalAPLs} APL${totalAPLs !== 1 ? 's' : ''}</span>` : '';
+
   let aplBlock = '';
 
-  // Current APL line
+  // Current APL line — with inline count badge
   if (r.curLabel) {
-    const tagHtml = r.tag
-      ? `<span class="q-apl-tag">(${r.tag})</span>`
-      : (item.queue !== 'red' ? `<span class="q-apl-tag">(Default)</span>` : '');
-    const moreHtml = r.moreOpts
-      ? `<div class="q-more-opts">${r.moreOpts}</div>` : '';
-
     aplBlock += `
-      <div class="q-apl-line">Current: <strong>${r.curLabel}</strong>${tagHtml}</div>
-      ${moreHtml}`;
+      <div class="q-apl-line">
+        <span style="color:#94A3B8;font-size:10px">Current:</span>
+        <strong>${r.curLabel}</strong>
+        ${aplCountBadge}
+      </div>`;
   } else {
-    aplBlock += `<div class="q-apl-line">Current: <span class="q-no-suggest">No supplier on file</span></div>`;
+    aplBlock += `
+      <div class="q-apl-line">
+        <span style="color:#94A3B8;font-size:10px">Current:</span>
+        <span class="q-no-suggest">No supplier on file</span>
+      </div>`;
   }
 
   // Suggested APL line
   if (r.sugLabel) {
-    aplBlock += `<div class="q-apl-line">Suggested: <strong>${r.sugLabel}</strong></div>`;
-  } else if (item.queue !== 'red') {
-    aplBlock += `<div class="q-apl-line">Suggested: <span class="q-no-suggest">No suggestion yet</span></div>`;
-  } else {
-    aplBlock += `<div class="q-apl-line">Suggested: <span class="q-no-suggest">Awaiting mapping</span></div>`;
+    aplBlock += `
+      <div class="q-apl-line">
+        <span style="color:#94A3B8;font-size:10px">Suggested:</span>
+        <strong>${r.sugLabel}</strong>
+      </div>`;
+  } else if (item.queue === 'red') {
+    aplBlock += `
+      <div class="q-apl-line">
+        <span style="color:#94A3B8;font-size:10px">Suggested:</span>
+        <span class="q-no-suggest">Awaiting mapping</span>
+      </div>`;
   }
 
   const savingHtml = r.saving
@@ -2381,10 +2462,9 @@ function buildQueueRow(item) {
   return `
     <div class="q-item c-${qc}" data-queue="${qc}" data-key="${item.key}" onclick="selectItem(this)">
       <div class="q-name">${item.name}${badgeHtml}</div>
-      <div class="q-loc">${item.site} &bull; ${item.pending}</div>
+      <div class="q-loc">${item.site}</div>
       <div class="q-apl-block">${aplBlock}</div>
       ${savingHtml}
-      <div class="q-reason">${r.reason}</div>
     </div>`;
 }
 
@@ -2407,16 +2487,16 @@ function renderDetail(item) {
 
 function buildDetailBody(item) {
   const recTypeClass = item.rec ? `rc-${item.rec.type}` : '';
-  const recIconPath = item.rec && item.rec.type === 'red'
-    ? `<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5" stroke-linecap="round"/>`
+  const recIconSVG = item.rec && item.rec.type === 'red'
+    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg>`
     : item.rec && item.rec.type === 'green'
-    ? `<polyline points="20 6 9 17 4 12"/>`
-    : `<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2.5" stroke-linecap="round"/>`;
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>`
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2.5"/></svg>`;
 
   let recCard = item.rec ? `
     <div class="rec-card ${recTypeClass}">
       <div class="rec-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">${recIconPath}</svg>
+        ${recIconSVG}
       </div>
       <div>
         <div class="rec-label">Recommended Action</div>
@@ -2491,66 +2571,43 @@ function buildDetailBody(item) {
     </div>` + histHtml;
 }
 
+function buildAPLCard(apl, extraClass = '', extraId = '') {
+  const isDefault = apl.isDefault;
+  const transTag = apl.transitioning
+    ? `<span class="badge-trans">Transitioning</span>` : '';
+  const defaultBadge = isDefault
+    ? `<span class="badge-default">★ Default</span>` : '';
+  const vsHtml = apl.vs
+    ? `<span class="cost-compare">${apl.vs}</span>` : '';
+
+  return `
+    <div class="apl-card ${isDefault ? 'default-apl' : ''} ${extraClass}"${extraId ? ` id="${extraId}"` : ''}>
+      <div class="card-header">
+        <span class="apl-tag apl-tag-light">${apl.id}</span>
+        ${transTag}
+        ${defaultBadge}
+      </div>
+      <div class="card-body">
+        <span class="apl-brand">${apl.brand}</span>
+        <div class="apl-size-price">
+          <span class="apl-size">${apl.size}</span>
+          <span class="apl-price">${apl.cost}</span>
+        </div>
+        ${vsHtml ? `<span class="cost-compare">${apl.vs}</span>` : ''}
+        <span class="status-tag">Active</span>
+      </div>
+    </div>`;
+}
+
 function buildCurrentAPLs(item) {
   let html = `<div class="apl-col-title">Current APLs</div>`;
 
-  item.currentAPLs.forEach((apl, idx) => {
-    const isDefault = apl.isDefault;
-    const transTag = apl.transitioning
-      ? `<span class="badge-trans">Transitioning</span>` : '';
-
-    html += `
-      <div class="apl-card ${isDefault ? 'default-apl' : ''}">
-        <div class="card-header">
-          ${isDefault ? `<span class="star">★</span>` : ''}
-          <span class="apl-tag apl-tag-light">${apl.id}</span>
-          ${isDefault ? `<span class="badge-default">Default</span>` : ''}
-          ${transTag}
-        </div>
-        <div class="field-row">
-          <span class="field-label">Brand</span>
-          <span class="field-value">${apl.brand}</span>
-        </div>
-        <div class="field-grid field-row">
-          <div>
-            <span class="field-label">Pack Size</span>
-            <span class="field-value">${apl.size}</span>
-          </div>
-          <div>
-            <span class="field-label">Cost</span>
-            <span class="field-value">${apl.cost}</span>
-            ${apl.vs ? `<span class="cost-compare">${apl.vs}</span>` : ''}
-          </div>
-        </div>
-        <span class="status-tag">Active</span>
-      </div>`;
-  });
+  item.currentAPLs.forEach(apl => { html += buildAPLCard(apl); });
 
   // Extra APLs (hidden by default)
   if (item.extraAPLs.length > 0) {
     item.extraAPLs.forEach((apl, i) => {
-      html += `
-        <div class="apl-card apl-extra" id="apl-extra-${i}">
-          <div class="card-header">
-            <span class="apl-tag apl-tag-light">${apl.id}</span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Brand</span>
-            <span class="field-value">${apl.brand}</span>
-          </div>
-          <div class="field-grid field-row">
-            <div>
-              <span class="field-label">Pack Size</span>
-              <span class="field-value">${apl.size}</span>
-            </div>
-            <div>
-              <span class="field-label">Cost</span>
-              <span class="field-value">${apl.cost}</span>
-              ${apl.vs ? `<span class="cost-compare">${apl.vs}</span>` : ''}
-            </div>
-          </div>
-          <span class="status-tag">Active</span>
-        </div>`;
+      html += buildAPLCard(apl, 'apl-extra', `apl-extra-${i}`);
     });
 
     const n = item.extraAPLs.length;
@@ -2559,7 +2616,7 @@ function buildCurrentAPLs(item) {
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        ${n} more option${n > 1 ? 's' : ''} (view all)
+        ${n} more APL${n > 1 ? 's' : ''} (view all)
       </button>`;
   }
 
@@ -2567,7 +2624,7 @@ function buildCurrentAPLs(item) {
 }
 
 function buildSuggestedAPL(item) {
-  let html = `<div class="apl-col-title">Suggested APL</div>`;
+  let html = `<div class="apl-col-title">Likely Match APL</div>`;
 
   if (!item.suggested) {
     html += `
@@ -2582,18 +2639,19 @@ function buildSuggestedAPL(item) {
   }
 
   const s = item.suggested;
+  const diffBadge = s.diff && s.diff !== 'Match'
+    ? `<span class="badge-diff">${s.diff}</span>` : '';
+  const newBadge = `<span class="badge-new" style="margin-left:auto">New</span>`;
+
   html += `
     <div class="apl-card suggested-card">
       <div class="card-header">
         <span class="apl-tag apl-tag-suggest">${s.id}</span>
-        <span class="badge-new">New</span>
-        <span class="badge-diff">${s.diff}</span>
+        ${diffBadge}
+        ${newBadge}
       </div>
-      <div class="field-row">
-        <span class="field-label">Brand</span>
-        <span class="field-value">${s.brand}</span>
-      </div>
-      <div class="field-grid field-row">
+      <div class="apl-brand">${s.brand}</div>
+      <div class="field-grid">
         <div>
           <span class="field-label">Pack Size</span>
           <span class="field-value">${s.size}</span>
@@ -2604,13 +2662,13 @@ function buildSuggestedAPL(item) {
         </div>
       </div>
       <div class="savings-pill">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
           <polyline points="17 6 23 6 23 12"/>
         </svg>
         ${s.savings}
       </div>
-      <div class="will-add">This will be available as an additional option</div>
+      <div class="will-add">Will be added to APL list</div>
     </div>`;
 
   return html;
@@ -2710,8 +2768,8 @@ function renderAction(item) {
   if (a.showModify) {
     html += `
       <div class="btn-wrap">
-        <button class="btn-modify" onclick="enterEditMode()">Modify Selection</button>
-        <div class="btn-desc">Override the AI suggestion manually</div>
+        <button class="btn-modify" onclick="enterEditMode()">Edit</button>
+        <div class="btn-desc">Modify the suggestion before confirming</div>
       </div>`;
   }
 

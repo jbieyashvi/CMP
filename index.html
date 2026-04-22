@@ -116,7 +116,7 @@ body {
 
 /* ─── Queue Panel ────────────────────────────── */
 .queue-panel {
-  width: 324px;
+  width: 252px;
   background: #ffffff;
   border-right: 1px solid #E8ECF2;
   display: flex; flex-direction: column;
@@ -194,10 +194,11 @@ body {
 .q-list { overflow-y: auto; flex: 1; }
 
 .q-item {
-  padding: 11px 14px 11px 18px;
+  padding: 12px 14px 12px 17px;
   border-bottom: 1px solid #F4F6F9;
   cursor: pointer; position: relative;
   transition: background .1s;
+  display: flex; align-items: flex-start; gap: 10px;
 }
 .q-item::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
@@ -210,6 +211,8 @@ body {
 .q-item:hover     { background: #FAFBFC; }
 .q-item.selected  { background: #F8FAFC; }
 .q-item.selected::before { opacity: 1; }
+/* Content wrapper — all text stacks from same left edge */
+.q-content { flex: 1; min-width: 0; }
 
 /* Row text */
 .q-name {
@@ -257,6 +260,149 @@ body {
 }
 .q-empty svg { margin: 0 auto 10px; display: block; opacity: .25; }
 
+/* ─── Bulk select system ─────────────────────── */
+
+/* "Confirm All" CTA bar — shown above list in green tab */
+/* Per-item checkbox — in-flow, always reserves its 14px + gap */
+.q-item-check {
+  width: 14px; height: 14px; border-radius: 3px;
+  border: 1.5px solid #CBD5E1; cursor: pointer;
+  accent-color: #16A34A; flex-shrink: 0;
+  margin-top: 2px;           /* align with title cap-height */
+  visibility: hidden;        /* reserves space → zero layout shift */
+  pointer-events: none;
+  transition: visibility 0s;
+}
+.bulk-mode-active .q-item[data-queue="green"] .q-item-check,
+.q-item[data-queue="green"]:hover .q-item-check,
+.q-item[data-queue="green"].bulk-sel .q-item-check {
+  visibility: visible; pointer-events: auto;
+}
+/* Selected = neutral tint only, no border */
+.q-item.bulk-sel { background: #F1F5F9 !important; }
+
+/* ── Bulk action bar (bottom of queue panel) ─────── */
+.bulk-bar {
+  display: none;
+  align-items: center; gap: 8px;
+  padding: 10px 12px;
+  background: #1E293B; border-top: 1px solid #334155;
+  position: sticky; bottom: 0; z-index: 20;
+  flex-shrink: 0;
+}
+.bulk-bar.visible { display: flex; }
+
+/* Left: select-all checkbox + label */
+.bulk-bar-select {
+  display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0; padding-right: 10px;
+  border-right: 1px solid #334155;
+}
+.bulk-bar-cb {
+  width: 14px; height: 14px; border-radius: 3px;
+  border: 1.5px solid #64748B; cursor: pointer;
+  accent-color: #16A34A; flex-shrink: 0;
+}
+.bulk-bar-sel-lbl {
+  font-size: 10.5px; font-weight: 500; color: #94A3B8;
+  cursor: pointer; user-select: none; white-space: nowrap;
+}
+
+/* Center: count label */
+.bulk-bar-count-wrap {
+  flex: 1; font-size: 11px; font-weight: 600; color: #E2E8F0;
+  white-space: nowrap;
+}
+.bulk-bar-count { color: #86EFAC; }
+
+/* Right: action buttons */
+.bulk-bar-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.bulk-btn-confirm {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 12px; border-radius: 7px;
+  background: #16A34A; color: #fff; border: none;
+  font-size: 11.5px; font-weight: 700; cursor: pointer;
+  transition: background .12s; white-space: nowrap;
+}
+.bulk-btn-confirm:hover { background: #15803D; }
+.bulk-btn-review {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 10px; border-radius: 7px;
+  background: transparent; color: #94A3B8;
+  border: 1px solid #334155;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all .12s; white-space: nowrap;
+}
+.bulk-btn-review:hover { background: #334155; color: #E2E8F0; }
+.bulk-bar-clear {
+  font-size: 10.5px; color: #64748B; cursor: pointer;
+  background: none; border: none; padding: 4px 6px;
+  border-radius: 5px; transition: color .12s;
+}
+.bulk-bar-clear:hover { color: #94A3B8; }
+
+/* Bulk confirm modal */
+.bulk-modal-overlay {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(15,23,42,.5);
+  backdrop-filter: blur(3px);
+  display: none; align-items: center; justify-content: center;
+  animation: modalFadeIn .14s ease;
+}
+.bulk-modal-overlay.visible { display: flex; }
+.bulk-modal-box {
+  background: #fff; border-radius: 14px;
+  padding: 28px 28px 24px;
+  width: 380px; max-width: 92vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+}
+.bulk-modal-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: #F0FDF4; display: flex; align-items: center;
+  justify-content: center; margin-bottom: 16px;
+}
+.bulk-modal-title {
+  font-size: 16px; font-weight: 700; color: #0F172A;
+  margin-bottom: 8px; letter-spacing: -.2px;
+}
+.bulk-modal-body {
+  font-size: 13px; color: #64748B; line-height: 1.6;
+  margin-bottom: 22px;
+}
+.bulk-modal-body strong { color: #0F172A; }
+.bulk-modal-items {
+  background: #F8FAFC; border: 1px solid #F1F5F9;
+  border-radius: 8px; padding: 10px 12px;
+  margin: 12px 0 0; max-height: 140px; overflow-y: auto;
+}
+.bulk-modal-item {
+  font-size: 11.5px; color: #334155; padding: 3px 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.bulk-modal-item::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #16A34A; flex-shrink: 0;
+}
+.bulk-modal-actions {
+  display: flex; gap: 8px;
+}
+.bulk-modal-confirm {
+  flex: 1; padding: 11px; border-radius: 9px;
+  background: #16A34A; color: #fff; border: none;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background .12s;
+}
+.bulk-modal-confirm:hover { background: #15803D; }
+.bulk-modal-cancel {
+  padding: 11px 18px; border-radius: 9px;
+  background: #F8FAFC; color: #475569;
+  border: 1px solid #E2E8F0;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background .12s;
+}
+.bulk-modal-cancel:hover { background: #F1F5F9; }
+
 /* ─── Detail Panel ───────────────────────────── */
 .main-content {
   flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
@@ -280,16 +426,51 @@ body {
 .bc-sep { color: #CBD5E1; }
 
 .content-body {
-  flex: 1; overflow-y: auto; padding: 22px 24px; background: #ffffff;
+  flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;
 }
 
-/* Recommended / context card */
+/* ─── Detail layout: pinned rec card, scrollable columns, footer ── */
+/* Legacy-scroll wrapper — used for green / blue / confirmed / red views */
+.detail-scroll-wrap {
+  flex: 1; overflow-y: auto; padding: 22px 24px; min-height: 0;
+}
+/* Pinned "Recommended Action" card — never scrolls away */
+.detail-pinned {
+  padding: 14px 22px 0; flex-shrink: 0;
+}
+/* Two independently-scrollable APL columns */
+.detail-cols-area {
+  flex: 1; min-height: 0; overflow: hidden;
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #F1F5F9;
+}
+.detail-cols-area.single-col { grid-template-columns: 1fr; }
+.detail-col {
+  overflow-y: auto; padding: 14px 18px 16px 22px;
+  min-height: 0; display: flex; flex-direction: column;
+  scrollbar-width: thin; scrollbar-color: #E2E8F0 transparent;
+}
+.detail-col::-webkit-scrollbar { width: 4px; }
+.detail-col::-webkit-scrollbar-track { background: transparent; }
+.detail-col::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
+.detail-col + .detail-col {
+  border-left: 1px solid #F1F5F9;
+  padding: 14px 22px 16px 18px;
+}
+/* History footer — low-prominence, always visible at bottom */
+.detail-footer {
+  flex-shrink: 0; padding: 8px 22px 9px;
+  border-top: 1px solid #F1F5F9; background: #fff;
+  display: flex; gap: 28px;
+}
+
+/* Recommended / context card — pinned at top, compact bottom margin */
 .rec-card {
   background: #F8FAFC; border: 1px solid #E8ECF2;
   border-left: 3px solid #94A3B8;
-  border-radius: 10px; padding: 14px 16px;
-  display: flex; align-items: flex-start; gap: 13px;
-  margin-bottom: 24px;
+  border-radius: 10px; padding: 11px 14px;
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 12px;
 }
 /* Purple gradient "Recommended Action" banner — amber queue items */
 .rec-card.rc-amber {
@@ -318,11 +499,15 @@ body {
 .rec-sub { font-size: 12px; color: #64748B; line-height: 1.5; }
 .rec-card.rc-amber .rec-sub { color: #5B21B6; }
 
-/* APL columns */
-.apl-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+/* APL columns — legacy layout used in green/blue/red single-col views */
+.apl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
 .apl-col-title {
   font-size: 10px; font-weight: 600; color: #94A3B8;
-  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px;
+  text-transform: uppercase; letter-spacing: .6px;
+  /* sticky within .detail-col scroll container */
+  position: sticky; top: 0; z-index: 2;
+  background: #fff; padding: 2px 0 10px; margin-bottom: 0;
+  border-bottom: 1px solid #F1F5F9; margin-bottom: 10px;
 }
 
 /* ─── APL cards — 2-row compact layout ─────────── */
@@ -452,22 +637,293 @@ body {
 .no-supplier-block p { font-size: 12.5px; line-height: 1.6; }
 .no-supplier-block strong { color: #64748B; font-weight: 500; }
 
-/* History context */
+/* ─── Compact Current APL list ──────────────────── */
+.apl-section { margin-bottom: 0; }
+.apl-section-hdr {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 8px; cursor: default; user-select: none;
+  /* sticky within .detail-col scroll container */
+  position: sticky; top: 0; z-index: 2;
+  background: #fff; padding: 2px 0 8px;
+  border-bottom: 1px solid #F1F5F9;
+  margin-bottom: 8px;
+}
+.apl-section-title {
+  font-size: 10px; font-weight: 600; color: #94A3B8;
+  text-transform: uppercase; letter-spacing: .6px; flex: 1;
+}
+.apl-section-count {
+  font-size: 9.5px; color: #94A3B8;
+  background: #F1F5F9; border-radius: 4px;
+  padding: 1px 6px; border: 1px solid #E8ECF2;
+}
+.apl-section-chevron { transition: transform .18s; flex-shrink: 0; color: #CBD5E1; }
+.apl-section.collapsed .apl-section-chevron { transform: rotate(-90deg); }
+.apl-section.collapsed .apl-section-body { display: none; }
+.apl-section-body { border: 1px solid #E8ECF2; border-radius: 9px; overflow: hidden; }
+
+.apl-list-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px; border-bottom: 1px solid #F4F6F9;
+  font-size: 12px; transition: background .1s;
+}
+.apl-list-row:last-child { border-bottom: none; }
+/* subtle zebra stripe */
+.apl-section-body .apl-list-row:nth-child(even) { background: #FAFBFC; }
+.apl-list-row:hover { background: #F1F5F9 !important; }
+.apl-list-row.is-default { background: #F7FDF9 !important; }
+.apl-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; flex-shrink: 0; }
+.apl-row-brand {
+  flex: 1; min-width: 0; font-size: 12px; font-weight: 600; color: #0F172A;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.apl-row-size {
+  font-size: 11px; color: #94A3B8; flex-shrink: 0; white-space: nowrap;
+  min-width: 44px;  /* aligned column */
+}
+.apl-row-price {
+  font-size: 12px; font-weight: 700; color: #0F172A;
+  flex-shrink: 0; min-width: 52px; text-align: right;
+}
+.apl-row-def {
+  flex-shrink: 0; padding: 1px 6px;
+  background: #F0FDF4; border: 1px solid #BBF7D0;
+  border-radius: 20px; font-size: 9px; font-weight: 700; color: #15803D;
+}
+
+/* ─── Likely Matches — wrapper, toolbar, select-all ── */
+.cand-wrapper {
+  border: 1px solid #E8ECF2; border-radius: 10px; overflow: hidden;
+}
+.cand-controls {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 7px 10px; background: #F8FAFC;
+  border-bottom: 1px solid #E8ECF2;
+}
+.cand-sort {
+  font-size: 10.5px; font-weight: 500; color: #475569;
+  border: 1px solid #E2E8F0; background: #fff;
+  border-radius: 5px; padding: 3px 20px 3px 7px;
+  cursor: pointer; outline: none; flex-shrink: 0;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 5px center;
+}
+.cand-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 9.5px; font-weight: 600; cursor: pointer;
+  border: 1px solid #E2E8F0; background: #fff; color: #64748B;
+  transition: all .12s; user-select: none; flex-shrink: 0;
+}
+.cand-chip.active { background: #0F172A; border-color: #0F172A; color: #fff; }
+.cand-no-results {
+  padding: 20px; text-align: center;
+  color: #94A3B8; font-size: 11.5px; font-style: italic;
+}
+
+/* Select-all header row */
+.cand-select-all {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; background: #F8FAFC;
+  border-bottom: 1px solid #E8ECF2;
+}
+.cand-select-all-cb {
+  width: 13px; height: 13px; accent-color: #2563EB;
+  cursor: pointer; flex-shrink: 0;
+}
+.cand-select-all-lbl {
+  font-size: 11px; font-weight: 500; color: #64748B;
+  cursor: pointer; flex: 1; user-select: none;
+}
+.cand-sel-count {
+  font-size: 10px; color: #94A3B8;
+}
+
+/* Hide legacy radio inputs */
+.cand-radio { display: none !important; }
+
+/* Confirm button disabled state */
+.btn-confirm:disabled,
+.btn-confirm[disabled] {
+  opacity: .4; cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* View-more toggle inside current APL section */
+.apl-view-more-btn {
+  width: 100%; padding: 7px 12px;
+  background: transparent; border: none; border-top: 1px solid #F1F5F9;
+  font-size: 11px; font-weight: 500; color: #64748B;
+  cursor: pointer; text-align: left;
+  display: flex; align-items: center; gap: 5px;
+  transition: color .1s, background .1s;
+}
+.apl-view-more-btn:hover { background: #F8FAFC; color: #334155; }
+.apl-extra-rows { overflow: hidden; }
+
+/* ─── Candidate APL selection list ──────────────── */
+/* No max-height — .detail-col is the scroll container */
+.cand-list { overflow: hidden; }
+/* Checkbox wrap */
+.cand-cb-wrap { display: flex; align-items: flex-start; padding-top: 2px; flex-shrink: 0; }
+.cand-cb {
+  width: 13px; height: 13px; accent-color: #2563EB;
+  cursor: pointer; flex-shrink: 0;
+}
+.cand-row {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 6px 10px; border-bottom: 1px solid #F1F5F9;
+  cursor: default; transition: background .1s; user-select: none;
+}
+.cand-row:last-child { border-bottom: none; }
+/* subtle zebra stripe for candidate rows */
+.cand-list .cand-row:nth-child(even) { background: #FAFBFC; }
+.cand-row:hover { background: #F1F5F9 !important; }
+.cand-row.cand-sel { background: #EFF6FF !important; }
+.cand-main { flex: 1; min-width: 0; }
+.cand-brand {
+  font-size: 12.5px; font-weight: 700; color: #0F172A;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.cand-meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px;
+}
+.cand-size  { color: #94A3B8; font-weight: 500; }
+.cand-dot   { color: #E2E8F0; }
+.cand-price { font-weight: 700; color: #0F172A; }
+.cand-tags  { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.ctag {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 1.5px 7px; border-radius: 20px;
+  font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+.ctag-rec   { background: #EDE9FE; border: 1px solid #DDD6FE; color: #7C3AED; }
+.ctag-cheap { background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; }
+.ctag-diff  { background: #FFF7ED; border: 1px solid #FED7AA; color: #C2410C; }
+.ctag-high  { background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; }
+.ctag-save  { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; }
+
+/* ─── Per-row Accept / Reject actions (hover-only) ──── */
+.cand-actions {
+  display: flex; align-items: center; gap: 5px;
+  flex-shrink: 0; margin-left: auto;
+  opacity: 0; pointer-events: none; transition: opacity .12s;
+}
+.cand-row:hover .cand-actions,
+.cand-row.cand-accepted .cand-actions,
+.cand-row.cand-rejected .cand-actions { opacity: 1; pointer-events: auto; }
+
+.cand-btn-accept {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 5px;
+  background: #16A34A; color: #fff; border: none;
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  transition: background .12s; white-space: nowrap;
+}
+.cand-btn-accept:hover { background: #15803D; }
+
+.cand-btn-reject {
+  padding: 3px 8px; border-radius: 5px;
+  background: transparent; color: #94A3B8;
+  border: 1px solid #E2E8F0;
+  font-size: 10px; font-weight: 600; cursor: pointer;
+  transition: all .12s; white-space: nowrap;
+}
+.cand-btn-reject:hover { border-color: #FCA5A5; color: #EF4444; background: #FFF5F5; }
+
+.cand-btn-undo {
+  padding: 2px 7px; border-radius: 5px;
+  background: transparent; color: #94A3B8;
+  border: 1px solid #E2E8F0;
+  font-size: 9.5px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; transition: all .12s;
+}
+.cand-btn-undo:hover { background: #F1F5F9; color: #475569; }
+
+/* Accepted row */
+.cand-row.cand-accepted { background: #F0FDF4 !important; border-left: 2px solid #16A34A; }
+.cand-row.cand-accepted .cand-brand { color: #15803D; }
+.cand-accepted-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 20px;
+  font-size: 9px; font-weight: 700; color: #15803D;
+  background: #DCFCE7; border: 1px solid #BBF7D0;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* Rejected row */
+.cand-row.cand-rejected { opacity: 0.35; pointer-events: auto; }
+.cand-row.cand-rejected:hover { opacity: 0.65; }
+.cand-row.cand-rejected .cand-brand { text-decoration: line-through; }
+.cand-rejected-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px; border-radius: 20px;
+  font-size: 9px; font-weight: 600; color: #94A3B8;
+  background: #F1F5F9; border: 1px solid #E2E8F0;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* ─── Bulk action bar (below the list) ───────────── */
+.cand-bulk-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 12px; background: #EFF6FF;
+  border-top: 1px solid #BFDBFE;
+}
+.cand-bulk-bar[hidden] { display: none; }
+.cand-bulk-count {
+  font-size: 11.5px; font-weight: 600; color: #1D4ED8; flex: 1;
+}
+.cand-bulk-accept {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 6px;
+  background: #16A34A; color: #fff; border: none; cursor: pointer;
+  font-size: 11px; font-weight: 600;
+  transition: background .12s; white-space: nowrap;
+}
+.cand-bulk-accept:hover { background: #15803D; }
+.cand-bulk-reject {
+  padding: 5px 11px; border-radius: 6px;
+  background: transparent; color: #64748B;
+  border: 1.5px solid #CBD5E1; cursor: pointer;
+  font-size: 11px; font-weight: 500;
+  transition: all .12s; white-space: nowrap;
+}
+.cand-bulk-reject:hover { border-color: #FCA5A5; color: #EF4444; background: #FFF5F5; }
+.cand-bulk-clear {
+  width: 24px; height: 24px; border-radius: 5px;
+  background: transparent; color: #94A3B8;
+  border: none; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .1s;
+}
+.cand-bulk-clear:hover { color: #475569; background: #DBEAFE; }
+
+/* Accepted candidate added to Current APLs */
+.apl-row-new-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 1px 6px; border-radius: 20px; margin-left: 5px;
+  font-size: 8.5px; font-weight: 700; color: #15803D;
+  background: #DCFCE7; border: 1px solid #BBF7D0;
+}
+
+/* History context — now lives in .detail-footer, compact */
 .history-context {
-  margin-top: 22px; padding-top: 18px;
-  border-top: 1px solid #E8ECF2;
-  display: flex; gap: 32px;
+  margin: 0; padding: 0; border: none;
+  display: flex; gap: 28px; align-items: center;
 }
 .hc-label {
-  font-size: 9.5px; color: #CBD5E1;
+  font-size: 9px; color: #CBD5E1;
   text-transform: uppercase; letter-spacing: .4px;
-  font-weight: 500; margin-bottom: 3px;
+  font-weight: 500; margin-bottom: 1px;
 }
-.hc-value { font-size: 12px; color: #64748B; }
+.hc-value { font-size: 11px; color: #94A3B8; }
 
 /* ─── Action Panel ───────────────────────────── */
 .right-panel {
-  width: 272px; background: #ffffff;
+  width: 252px; background: #ffffff;
   border-left: 1px solid #E8ECF2;
   display: flex; flex-direction: column; flex-shrink: 0;
 }
@@ -1850,6 +2306,7 @@ body {
 
   <div class="q-chips" id="q-chips"></div>
 
+
   <div class="q-list" id="q-list">
     <!-- Rows rendered by JS via buildQueueRow() + init() -->
     <div class="q-empty" id="q-empty">
@@ -1858,6 +2315,48 @@ body {
         <line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       No items match your search
+    </div>
+  </div>
+
+  <!-- Bulk action bar (single-row, bottom sticky) -->
+  <div class="bulk-bar" id="bulk-bar">
+    <div class="bulk-bar-select">
+      <input type="checkbox" class="bulk-bar-cb" id="bulk-bar-master"
+             onchange="toggleMasterSelect(this)">
+      <label class="bulk-bar-sel-lbl" for="bulk-bar-master">Select all</label>
+    </div>
+    <div class="bulk-bar-count-wrap">
+      <span class="bulk-bar-count" id="bulk-bar-count">0</span> selected
+    </div>
+    <div class="bulk-bar-actions">
+      <button class="bulk-btn-review" onclick="reviewNextSelected()">Review</button>
+      <button class="bulk-btn-confirm" onclick="openBulkModal()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirm
+      </button>
+      <button class="bulk-bar-clear" onclick="clearBulkSelection()">✕</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bulk confirm modal -->
+<div class="bulk-modal-overlay" id="bulk-modal-overlay" onclick="closeBulkModal(event)">
+  <div class="bulk-modal-box" onclick="event.stopPropagation()">
+    <div class="bulk-modal-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="bulk-modal-title">Confirm mappings?</div>
+    <div class="bulk-modal-body">
+      You are about to confirm mapping for <strong id="modal-item-count">0 items</strong>. This will set the AI-suggested APL as the default for each.
+      <div class="bulk-modal-items" id="modal-item-list"></div>
+    </div>
+    <div class="bulk-modal-actions">
+      <button class="bulk-modal-cancel" onclick="closeBulkModal()">Cancel</button>
+      <button class="bulk-modal-confirm" onclick="executeBulkConfirm()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirm
+      </button>
     </div>
   </div>
 </div>
@@ -2174,13 +2673,30 @@ const ITEMS = {
     breadcrumb: ['Elementary MOG', 'Yeast', 'Mumbai MUM-PR-07'],
     rec: { type: 'amber', heading: 'Set as new default — ₹4 cheaper than current', sub: 'Lower cost option with similar specifications' },
     currentAPLs: [
-      { id: 'APL-5622-B', brand: 'Vista Yeast',       size: '250g',  cost: '₹84.00', isDefault: true,  vs: '+₹4 vs suggested',  active: true },
-      { id: 'APL-5623-C', brand: 'Spice Route Yeast', size: '50g',   cost: '₹90.00', isDefault: false, vs: '+₹10 vs suggested', active: true },
+      { id: 'APL-5622-B', brand: 'Vista Yeast',           size: '250g',  cost: '₹84.00', isDefault: true,  active: true },
+      { id: 'APL-5623-C', brand: 'Spice Route Yeast',     size: '50g',   cost: '₹90.00', isDefault: false, active: true },
     ],
     extraAPLs: [
-      { id: 'APL-5624-D', brand: 'Eastern Spice Co.', size: '100g',  cost: '₹88.00', isDefault: false, vs: '+₹8 vs suggested',  active: true },
+      { id: 'APL-5624-D', brand: 'Eastern Spice Co.',     size: '100g',  cost: '₹88.00', isDefault: false, active: true },
+      { id: 'APL-5628-E', brand: 'National Yeast Corp',   size: '250g',  cost: '₹87.00', isDefault: false, active: true },
+      { id: 'APL-5629-F', brand: 'Bake Fresh',            size: '500g',  cost: '₹92.00', isDefault: false, active: true },
+      { id: 'APL-5630-G', brand: 'Pure Rise',             size: '250g',  cost: '₹85.00', isDefault: false, active: true },
+      { id: 'APL-5631-H', brand: 'Harvest Yeast',         size: '100g',  cost: '₹81.00', isDefault: false, active: true },
+      { id: 'APL-5632-I', brand: 'Fermex Industries',     size: '1kg',   cost: '₹310.00',isDefault: false, active: true },
+      { id: 'APL-5633-J', brand: 'Golden Rise',           size: '250g',  cost: '₹86.00', isDefault: false, active: true },
+      { id: 'APL-5634-K', brand: 'Sunrise Bakery Supp.',  size: '50g',   cost: '₹45.00', isDefault: false, active: true },
+      { id: 'APL-5635-L', brand: 'ProBake Ingredients',   size: '500g',  cost: '₹95.00', isDefault: false, active: true },
+      { id: 'APL-5636-M', brand: 'Continental Yeast',     size: '250g',  cost: '₹89.00', isDefault: false, active: true },
     ],
     suggested: { id: 'APL-5625-NEW', brand: 'Global Spice Traders', size: '100g', cost: '₹80.00', savings: '₹4 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-5625-NEW', brand: 'Global Spice Traders', size: '100g', cost: '₹80.00', tags: [{type:'rec'},{type:'save',label:'₹4 cheaper'}] },
+      { id: 'APL-5626-B',   brand: 'Spice Route',          size: '50g',  cost: '₹78.00', tags: [{type:'cheap'},{type:'diff',label:'Diff. pack size'}] },
+      { id: 'APL-5627-C',   brand: 'Organic Supply Co.',   size: '120g', cost: '₹82.00', tags: [{type:'diff',label:'Diff. pack size'}] },
+      { id: 'APL-5640-D',   brand: 'BakePro Essentials',   size: '250g', cost: '₹83.00', tags: [{type:'save',label:'₹1 cheaper'}] },
+      { id: 'APL-5641-E',   brand: 'FreshRise Foods',      size: '100g', cost: '₹86.00', tags: [{type:'high'}] },
+      { id: 'APL-5642-F',   brand: 'Premier Ingredients',  size: '250g', cost: '₹79.00', tags: [{type:'cheap'},{type:'save',label:'₹5 cheaper'}] },
+    ],
     history: { prev: 'Vista Yeast ₹84', updated: '5 days ago' },
     qRow: { curLabel: 'Vista Yeast ₹84', moreOpts: '+2 more options on file', sugLabel: 'Global Spice ₹80', saving: '↓ ₹4 cheaper', reason: 'Pack size mismatch', badge: '+2 APLs' },
     action: { opt1: { label: 'Set as new default', cost: '₹80', sub: 'saves ₹4 per unit' }, opt2: { label: 'Keep current default', cost: '₹84', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'Accept suggestion and apply this mapping', showModify: true, showReject: true }
@@ -2197,6 +2713,10 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-4402-NEW', brand: 'Global Spice Traders', size: '500g', cost: '₹80.00', savings: '₹4 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-4402-NEW', brand: 'Global Spice Traders', size: '500g', cost: '₹80.00', tags: [{type:'rec'},{type:'save',label:'₹4 cheaper'}] },
+      { id: 'APL-4403-B',   brand: 'National Foods',       size: '500g', cost: '₹83.00', tags: [{type:'high'}] },
+    ],
     history: { prev: 'Vista Yeast ₹84', updated: '2 days ago' },
     qRow: { curLabel: 'Vista Yeast ₹84', sugLabel: 'Global Spice ₹80', saving: '↓ ₹4 cheaper', reason: 'Brand changed' },
     action: { opt1: { label: 'Set as new default', cost: '₹80', sub: 'saves ₹4 per unit' }, opt2: { label: 'Keep current default', cost: '₹84', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'Accept suggestion and apply this mapping', showModify: true, showReject: true }
@@ -2213,6 +2733,11 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-3311-NEW', brand: 'Spice Route', size: '1kg', cost: '₹78.00', savings: '₹6 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-3311-NEW', brand: 'Spice Route',         size: '1kg', cost: '₹78.00', tags: [{type:'rec'},{type:'cheap'}] },
+      { id: 'APL-3312-B',   brand: 'Pure Harvest',        size: '1kg', cost: '₹79.00', tags: [{type:'save',label:'₹5 cheaper'}] },
+      { id: 'APL-3313-C',   brand: 'Golden Fields',       size: '500g', cost: '₹82.00', tags: [{type:'diff',label:'Diff. pack size'},{type:'high'}] },
+    ],
     history: { prev: 'Vista Yeast ₹84', updated: '1 day ago' },
     qRow: { curLabel: 'Vista Yeast ₹84', sugLabel: 'Spice Route ₹78', saving: '↓ ₹6 cheaper', reason: 'Brand changed' },
     action: { opt1: { label: 'Set as new default', cost: '₹78', sub: 'saves ₹6 per unit' }, opt2: { label: 'Keep current default', cost: '₹84', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'Accept suggestion and apply this mapping', showModify: true, showReject: true }
@@ -2245,6 +2770,11 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-6602-NEW', brand: 'Spice Route', size: '250g', cost: '₹81.00', savings: '₹3 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-6602-NEW', brand: 'Spice Route',         size: '250g', cost: '₹81.00', tags: [{type:'rec'},{type:'save',label:'₹3 cheaper'}] },
+      { id: 'APL-6603-B',   brand: 'Tropical Mills',      size: '250g', cost: '₹79.00', tags: [{type:'cheap'}] },
+      { id: 'APL-6604-C',   brand: 'Desiccated Foods',    size: '500g', cost: '₹86.00', tags: [{type:'diff',label:'Diff. pack size'},{type:'high'}] },
+    ],
     history: { prev: 'Vista Yeast ₹84', updated: '4 days ago' },
     qRow: { curLabel: 'Vista Yeast ₹84', sugLabel: 'Spice Route ₹81', saving: '↓ ₹3 cheaper', reason: 'Brand changed' },
     action: { opt1: { label: 'Set as new default', cost: '₹81', sub: 'saves ₹3 per unit' }, opt2: { label: 'Keep current default', cost: '₹84', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'Accept suggestion and apply this mapping', showModify: true, showReject: true }
@@ -2261,6 +2791,11 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-8802-NEW', brand: 'Global Spice Traders', size: '500g', cost: '₹80.00', savings: '₹4 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-8802-NEW', brand: 'Global Spice Traders', size: '500g', cost: '₹80.00', tags: [{type:'rec'},{type:'save',label:'₹4 cheaper'}] },
+      { id: 'APL-8803-B',   brand: 'NutriSource',          size: '500g', cost: '₹77.00', tags: [{type:'cheap'}] },
+      { id: 'APL-8804-C',   brand: 'Heritage Farms',       size: '250g', cost: '₹88.00', tags: [{type:'diff',label:'Diff. pack size'},{type:'high'}] },
+    ],
     history: { prev: 'Vista Yeast ₹84', updated: '2 days ago' },
     qRow: { curLabel: 'Vista Yeast ₹84', sugLabel: 'Global Spice ₹80', saving: '↓ ₹4 cheaper', reason: 'Price changed' },
     action: { opt1: { label: 'Set as new default', cost: '₹80', sub: 'saves ₹4 per unit' }, opt2: { label: 'Keep current default', cost: '₹84', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'Accept suggestion and apply this mapping', showModify: true, showReject: true }
@@ -2278,6 +2813,11 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-1121-NEW', brand: 'Pure Salt', size: '1kg', cost: '₹55.00', savings: '₹5 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-1121-NEW', brand: 'Pure Salt',            size: '1kg', cost: '₹55.00', tags: [{type:'rec'},{type:'cheap'}] },
+      { id: 'APL-1122-B',   brand: 'Tata Salt',            size: '1kg', cost: '₹57.00', tags: [{type:'save',label:'₹3 cheaper'}] },
+      { id: 'APL-1123-C',   brand: 'Catch Salt',           size: '500g', cost: '₹62.00', tags: [{type:'diff',label:'Diff. pack size'},{type:'high'}] },
+    ],
     history: { prev: 'Himalayan Salt Co. ₹60', updated: '1 day ago' },
     qRow: { curLabel: 'Himalayan Salt Co. ₹60', sugLabel: 'Pure Salt ₹55', saving: '↓ ₹5 cheaper', reason: 'AI confidence high' },
     action: { opt1: { label: 'Set as new default', cost: '₹55', sub: 'saves ₹5 per unit' }, opt2: { label: 'Keep current default', cost: '₹60', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'AI is confident — confirm to apply', showModify: true, showReject: true }
@@ -2294,6 +2834,11 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-2231-NEW', brand: 'Aromatic Spices', size: '200g', cost: '₹112.00', savings: '₹8 saved vs current default', diff: 'Pack size differs' },
+    candidates: [
+      { id: 'APL-2231-NEW', brand: 'Aromatic Spices',     size: '200g', cost: '₹112.00', tags: [{type:'rec'},{type:'save',label:'₹8 cheaper'},{type:'diff',label:'Diff. pack size'}] },
+      { id: 'APL-2232-B',   brand: 'Eastern Spice Co.',   size: '100g', cost: '₹108.00', tags: [{type:'cheap'}] },
+      { id: 'APL-2233-C',   brand: 'Spice Garden',        size: '100g', cost: '₹120.00', tags: [{type:'high'}] },
+    ],
     history: { prev: 'Spice Garden ₹120', updated: '1 day ago' },
     qRow: { curLabel: 'Spice Garden ₹120', sugLabel: 'Aromatic Spices ₹112', saving: '↓ ₹8 cheaper', reason: 'Same brand, better pack size' },
     action: { opt1: { label: 'Set as new default', cost: '₹112', sub: 'saves ₹8 per unit' }, opt2: { label: 'Keep current default', cost: '₹120', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'AI is confident — confirm to apply', showModify: true, showReject: true }
@@ -2310,6 +2855,10 @@ const ITEMS = {
     ],
     extraAPLs: [],
     suggested: { id: 'APL-3341-NEW', brand: 'Uttam', size: '1kg', cost: '₹42.00', savings: '₹3 saved vs current default', diff: 'Brand differs' },
+    candidates: [
+      { id: 'APL-3341-NEW', brand: 'Uttam',                size: '1kg', cost: '₹42.00', tags: [{type:'rec'},{type:'cheap'}] },
+      { id: 'APL-3342-B',   brand: 'Dhampur Green',        size: '1kg', cost: '₹44.00', tags: [{type:'save',label:'₹1 cheaper'}] },
+    ],
     history: { prev: 'Parrys ₹45', updated: '2 days ago' },
     qRow: { curLabel: 'Parrys ₹45', sugLabel: 'Uttam ₹42', saving: '↓ ₹3 cheaper', reason: 'Lower cost, equivalent spec' },
     action: { opt1: { label: 'Set as new default', cost: '₹42', sub: 'saves ₹3 per unit' }, opt2: { label: 'Keep current default', cost: '₹45', sub: 'no change' }, btnLabel: 'Confirm Mapping', btnDesc: 'AI is confident — confirm to apply', showModify: true, showReject: true }
@@ -2459,12 +3008,20 @@ function buildQueueRow(item) {
   const badgeHtml = r.badge
     ? `<span class="q-badge">${r.badge}</span>` : '';
 
+  const checkHtml = qc === 'green'
+    ? `<input type="checkbox" class="q-item-check" data-key="${item.key}"
+              onclick="event.stopPropagation()" onchange="toggleBulkItem('${item.key}', this)">`
+    : '';
+
   return `
     <div class="q-item c-${qc}" data-queue="${qc}" data-key="${item.key}" onclick="selectItem(this)">
-      <div class="q-name">${item.name}${badgeHtml}</div>
-      <div class="q-loc">${item.site}</div>
-      <div class="q-apl-block">${aplBlock}</div>
-      ${savingHtml}
+      ${checkHtml}
+      <div class="q-content">
+        <div class="q-name">${item.name}${badgeHtml}</div>
+        <div class="q-loc">${item.site}</div>
+        <div class="q-apl-block">${aplBlock}</div>
+        ${savingHtml}
+      </div>
     </div>`;
 }
 
@@ -2485,6 +3042,12 @@ function renderDetail(item) {
   document.getElementById('detail-body').innerHTML = buildDetailBody(item);
 }
 
+/* Helper: wraps html in a legacy single-scroll container (used for
+   green / blue / confirmed / red which don't use the 2-col layout) */
+function wrapDetailScroll(html) {
+  return `<div class="detail-scroll-wrap">${html}</div>`;
+}
+
 function buildDetailBody(item) {
   const recTypeClass = item.rec ? `rc-${item.rec.type}` : '';
   const recIconSVG = item.rec && item.rec.type === 'red'
@@ -2495,9 +3058,7 @@ function buildDetailBody(item) {
 
   let recCard = item.rec ? `
     <div class="rec-card ${recTypeClass}">
-      <div class="rec-icon">
-        ${recIconSVG}
-      </div>
+      <div class="rec-icon">${recIconSVG}</div>
       <div>
         <div class="rec-label">Recommended Action</div>
         <div class="rec-heading">${item.rec.heading}</div>
@@ -2505,21 +3066,19 @@ function buildDetailBody(item) {
       </div>
     </div>` : '';
 
-  // Confirmed state — takes priority over all other modes
-  if (confirmedItems[item.key]) return buildConfirmedDetailBody(item);
-  // Green queue — read-only view (pre-existing items not confirmed in this session)
-  if (item.queue === 'green') return buildGreenReadOnlyDetailBody(item);
-  // Blue queue — transition view (retiring APL + candidates; never auto-overridden)
-  if (item.queue === 'blue') return buildBlueDetailBody(item);
-  // Red queue — full-width APL search (no comparison UI; assign mode is the only state)
+  // Confirmed / green / blue — single scrollable column (no side-by-side split needed)
+  if (confirmedItems[item.key]) return wrapDetailScroll(buildConfirmedDetailBody(item));
+  if (item.queue === 'green')   return wrapDetailScroll(buildGreenReadOnlyDetailBody(item));
+  if (item.queue === 'blue')    return wrapDetailScroll(buildBlueDetailBody(item));
+
+  // Red queue — full-width search, single scrollable column
   if (item.queue === 'red') {
     const histHtml = item.history ? buildHistory(item) : '';
     const redRec = `
       <div class="rec-card rc-red">
         <div class="rec-icon">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="8" y1="12" x2="16" y2="12"/>
+            <circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>
           </svg>
         </div>
         <div>
@@ -2528,47 +3087,50 @@ function buildDetailBody(item) {
           <div class="rec-sub">${item.rec?.sub || 'Search for available APLs and assign one to this ingredient.'}</div>
         </div>
       </div>`;
-    return redRec + buildEditSuggestedCol(item) + histHtml;
+    return wrapDetailScroll(redRec + buildEditSuggestedCol(item) + histHtml);
   }
 
-  // Review mode — show override rec card + review columns
+  // ── Two-column layout: pinned rec card + independently-scrollable columns ──
+  // Wrap history in .detail-footer (strips the .history-context border/margin via CSS)
+  const footerHtml = item.history ? `<div class="detail-footer">${buildHistory(item)}</div>` : '';
+
+  // Review mode — post-save override review
   if (reviewMode) {
-    const histHtml = item.history ? buildHistory(item) : '';
-    return buildOverrideRecCard() + `
-      <div class="apl-cols">
-        <div>${buildReviewCurrentAPLs()}</div>
-        <div>${buildReviewSuggestedCol(item)}</div>
-      </div>` + histHtml;
+    return `
+      <div class="detail-pinned">${buildOverrideRecCard()}</div>
+      <div class="detail-cols-area">
+        <div class="detail-col">${buildReviewCurrentAPLs()}</div>
+        <div class="detail-col">${buildReviewSuggestedCol(item)}</div>
+      </div>${footerHtml}`;
   }
 
-  // No supplier state — but in edit mode always show two-column layout
+  // No supplier — single column empty state
   if (!editMode && item.currentAPLs.length === 0 && !item.suggested) {
-    const histHtml = item.history ? buildHistory(item) : '';
-    return recCard + `
-      <div class="apl-cols" style="grid-template-columns:1fr">
-        <div>
+    return `
+      <div class="detail-pinned">${recCard}</div>
+      <div class="detail-cols-area single-col">
+        <div class="detail-col">
           <div class="apl-col-title">Current APLs</div>
           <div class="no-supplier-block">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="8" y1="12" x2="16" y2="12"/>
+              <circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>
             </svg>
             <p><strong>No supplier on file</strong><br>This ingredient has not been mapped to any APL yet.</p>
           </div>
         </div>
-      </div>` + histHtml;
+      </div>${footerHtml}`;
   }
 
-  // Normal or edit mode: two columns
-  let currentCol  = buildCurrentAPLs(item);
-  let suggestedCol = editMode ? buildEditSuggestedCol(item) : buildSuggestedAPL(item);
-  const histHtml  = item.history ? buildHistory(item) : '';
+  // Normal or edit mode: full two-column split
+  const currentCol   = buildCurrentAPLs(item);
+  const suggestedCol = editMode ? buildEditSuggestedCol(item) : buildSuggestedAPL(item);
 
-  return recCard + `
-    <div class="apl-cols">
-      <div>${currentCol}</div>
-      <div>${suggestedCol}</div>
-    </div>` + histHtml;
+  return `
+    <div class="detail-pinned">${recCard}</div>
+    <div class="detail-cols-area">
+      <div class="detail-col" id="current-apl-col-${item.key}">${currentCol}</div>
+      <div class="detail-col">${suggestedCol}</div>
+    </div>${footerHtml}`;
 }
 
 function buildAPLCard(apl, extraClass = '', extraId = '') {
@@ -2599,34 +3161,98 @@ function buildAPLCard(apl, extraClass = '', extraId = '') {
     </div>`;
 }
 
+function buildAPLListRow(apl) {
+  const defBadge   = apl.isDefault    ? `<span class="apl-row-def">★ Default</span>` : '';
+  const transBadge = apl.transitioning
+    ? `<span class="badge-trans" style="padding:1px 6px;font-size:9px">Transitioning</span>` : '';
+  return `
+    <div class="apl-list-row${apl.isDefault ? ' is-default' : ''}">
+      <span class="apl-dot"></span>
+      <span class="apl-row-brand">${apl.brand}</span>
+      <span class="apl-row-size">${apl.size}</span>
+      <span class="apl-row-price">${apl.cost}</span>
+      ${defBadge}${transBadge}
+    </div>`;
+}
+
 function buildCurrentAPLs(item) {
-  let html = `<div class="apl-col-title">Current APLs</div>`;
+  const k        = item.key;
+  const rs       = getCandRowState(k);
+  const allAPLs  = [...item.currentAPLs, ...(item.extraAPLs || [])];
+  const defAPL   = allAPLs.find(a => a.isDefault) || allAPLs[0];
+  const restAPLs = allAPLs.filter(a => a !== defAPL);
 
-  item.currentAPLs.forEach(apl => { html += buildAPLCard(apl); });
+  // Accepted candidates displayed as newly-added rows
+  const acceptedCands = (item.candidates || []).filter(c => rs.acceptedIds.has(c.id));
+  const totalCount    = allAPLs.length + acceptedCands.length;
 
-  // Extra APLs (hidden by default)
-  if (item.extraAPLs.length > 0) {
-    item.extraAPLs.forEach((apl, i) => {
-      html += buildAPLCard(apl, 'apl-extra', `apl-extra-${i}`);
-    });
+  const extId = `apl-extra-${k}`;
+  const btnId = `apl-more-btn-${k}`;
 
-    const n = item.extraAPLs.length;
-    html += `
-      <button class="view-all-btn" id="view-all-btn" onclick="toggleViewAll()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        ${n} more APL${n > 1 ? 's' : ''} (view all)
-      </button>`;
+  const restRows = restAPLs.map(buildAPLListRow).join('');
+
+  // Accepted candidate rows (with "New" badge, styled like normal APL rows)
+  const newRows = acceptedCands.map(c => `
+    <div class="apl-list-row" style="background:#F0FDF4">
+      <span class="apl-dot" style="background:#16A34A"></span>
+      <span class="apl-row-brand">${c.brand}</span>
+      <span class="apl-row-size">${c.size}</span>
+      <span class="apl-row-price">${c.cost}</span>
+      <span class="apl-row-new-badge">New</span>
+    </div>`).join('');
+
+  const moreCount  = restAPLs.length + acceptedCands.length;
+  const moreBtn    = moreCount > 0 ? `
+    <button class="apl-view-more-btn" id="${btnId}"
+            onclick="toggleExtraAPLs('${k}')">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+      ${moreCount} more APL${moreCount !== 1 ? 's' : ''}
+    </button>` : '';
+
+  return `
+    <div class="apl-section">
+      <div class="apl-section-hdr" style="cursor:default">
+        <span class="apl-section-title">Current APLs</span>
+        <span class="apl-section-count">${totalCount}</span>
+      </div>
+      <div class="apl-section-body">
+        ${buildAPLListRow(defAPL)}
+        <div class="apl-extra-rows" id="${extId}" style="display:none">
+          ${restRows}${newRows}
+        </div>
+        ${moreBtn}
+      </div>
+    </div>`;
+}
+
+function toggleExtraAPLs(key) {
+  const rows = document.getElementById(`apl-extra-${key}`);
+  const btn  = document.getElementById(`apl-more-btn-${key}`);
+  if (!rows) return;
+  const isOpen = rows.style.display !== 'none';
+  rows.style.display = isOpen ? 'none' : 'block';
+  if (btn) {
+    const item  = ITEMS[key];
+    const allAPLs = [...(item?.currentAPLs || []), ...(item?.extraAPLs || [])];
+    const defAPL  = allAPLs.find(a => a.isDefault) || allAPLs[0];
+    const restN   = allAPLs.filter(a => a !== defAPL).length;
+    const newN    = (item?.candidates || []).filter(c => getCandRowState(key).acceptedIds.has(c.id)).length;
+    const moreN   = restN + newN;
+    btn.innerHTML = isOpen
+      ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg> ${moreN} more APL${moreN !== 1 ? 's' : ''}`
+      : `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg> Collapse`;
   }
-
-  return html;
 }
 
 function buildSuggestedAPL(item) {
-  let html = `<div class="apl-col-title">Likely Match APL</div>`;
+  const k     = item.key;
+  let   html  = `<div class="apl-col-title">Likely Matches</div>`;
 
-  if (!item.suggested) {
+  const cands = item.candidates;
+  if (!cands || cands.length === 0) {
     html += `
       <div class="no-supplier-block">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
@@ -2638,54 +3264,405 @@ function buildSuggestedAPL(item) {
     return html;
   }
 
-  const s = item.suggested;
-  const diffBadge = s.diff && s.diff !== 'Match'
-    ? `<span class="badge-diff">${s.diff}</span>` : '';
-  const newBadge = `<span class="badge-new" style="margin-left:auto">New</span>`;
+  const rs  = getCandRowState(k);
+  const sel = rs.selectedIds.size;
 
+  html += `<div class="cand-wrapper">`;
+
+  // Sort / filter toolbar
   html += `
-    <div class="apl-card suggested-card">
-      <div class="card-header">
-        <span class="apl-tag apl-tag-suggest">${s.id}</span>
-        ${diffBadge}
-        ${newBadge}
-      </div>
-      <div class="apl-brand">${s.brand}</div>
-      <div class="field-grid">
-        <div>
-          <span class="field-label">Pack Size</span>
-          <span class="field-value">${s.size}</span>
-        </div>
-        <div>
-          <span class="field-label">Cost</span>
-          <span class="field-value">${s.cost}</span>
-        </div>
-      </div>
-      <div class="savings-pill">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-          <polyline points="17 6 23 6 23 12"/>
-        </svg>
-        ${s.savings}
-      </div>
-      <div class="will-add">Will be added to APL list</div>
+    <div class="cand-controls">
+      <select class="cand-sort" onchange="sortCandList('${k}', this.value)">
+        <option value="rec">Recommended</option>
+        <option value="cost">Lowest cost</option>
+        <option value="pack">Closest pack size</option>
+      </select>
+      <span class="cand-chip" id="chip-same-pack-${k}"
+            onclick="toggleCandFilter('${k}','same-pack')">Same pack</span>
+      <span class="cand-chip" id="chip-lower-cost-${k}"
+            onclick="toggleCandFilter('${k}','lower-cost')">Lower cost</span>
     </div>`;
 
+  // Select-all header
+  html += `
+    <div class="cand-select-all">
+      <input type="checkbox" class="cand-select-all-cb" id="cand-sa-${k}"
+             onchange="toggleSelectAllCands('${k}',this)">
+      <label class="cand-select-all-lbl" for="cand-sa-${k}">Select all</label>
+      ${sel > 0 ? `<span class="cand-sel-count">${sel} selected</span>` : ''}
+    </div>`;
+
+  // Row list
+  html += `<div class="cand-list" id="cand-list-${k}">`;
+  cands.forEach(c => { html += buildCandRow(c, k, rs); });
+  html += `</div>`;
+
+  // Bulk action bar (hidden when nothing selected)
+  const chkSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const xSvg   = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  html += `
+    <div class="cand-bulk-bar" id="cand-bulk-bar-${k}"${sel === 0 ? ' hidden' : ''}>
+      <span class="cand-bulk-count" id="cand-bulk-count-${k}">${sel} selected</span>
+      <button class="cand-bulk-accept" onclick="acceptSelected('${k}')">
+        ${chkSvg} Accept Selected
+      </button>
+      <button class="cand-bulk-reject" onclick="rejectSelected('${k}')">
+        ${xSvg} Reject Selected
+      </button>
+      <button class="cand-bulk-clear" title="Clear selection" onclick="clearCandSelection('${k}')">✕</button>
+    </div>`;
+
+  html += `</div>`; // .cand-wrapper
+
   return html;
+}
+
+function renderCandTag(t) {
+  if (t.type === 'rec')   return `<span class="ctag ctag-rec">★ Recommended</span>`;
+  if (t.type === 'cheap') return `<span class="ctag ctag-cheap">Best price</span>`;
+  if (t.type === 'diff')  return `<span class="ctag ctag-diff">${t.label || 'Diff. pack size'}</span>`;
+  if (t.type === 'high')  return `<span class="ctag ctag-high">Higher cost</span>`;
+  if (t.type === 'save')  return `<span class="ctag ctag-save">${t.label}</span>`;
+  return '';
+}
+
+function selectCandidate(labelEl) {
+  const list = labelEl.closest('.cand-list');
+  if (!list) return;
+  list.querySelectorAll('.cand-row').forEach(r => r.classList.remove('cand-selected'));
+  labelEl.classList.add('cand-selected');
+}
+
+/* ─── Per-candidate accept / reject / select state ──── */
+const candRowState = {}; // { [key]: { selectedIds: Set, acceptedIds: Set, rejectedIds: Set } }
+
+function getCandRowState(k) {
+  if (!candRowState[k]) candRowState[k] = {
+    selectedIds: new Set(),
+    acceptedIds:  new Set(),
+    rejectedIds:  new Set()
+  };
+  return candRowState[k];
+}
+
+/* ── Single-row quick actions (triggered from hover buttons) ── */
+function quickAcceptCandidate(k, candId) {
+  const rs = getCandRowState(k);
+  rs.acceptedIds.add(candId);
+  rs.rejectedIds.delete(candId);
+  rs.selectedIds.delete(candId);
+  rebuildCandList(k);
+  rebuildCurrentAPLs(k);
+  syncConfirmBtn(k);
+}
+
+function quickRejectCandidate(k, candId) {
+  const rs = getCandRowState(k);
+  rs.rejectedIds.add(candId);
+  rs.acceptedIds.delete(candId);
+  rs.selectedIds.delete(candId);
+  rebuildCandList(k);
+  rebuildCurrentAPLs(k);
+  syncConfirmBtn(k);
+}
+
+function undoAcceptCandidate(k, candId) {
+  const rs = getCandRowState(k);
+  rs.acceptedIds.delete(candId);
+  rebuildCandList(k);
+  rebuildCurrentAPLs(k);
+  syncConfirmBtn(k);
+}
+
+function undoRejectCandidate(k, candId) {
+  const rs = getCandRowState(k);
+  rs.rejectedIds.delete(candId);
+  rebuildCandList(k);
+  syncConfirmBtn(k);
+}
+
+/* ── Checkbox selection ──────────────────────────── */
+function toggleCandSelect(k, candId, el) {
+  const rs = getCandRowState(k);
+  if (el.checked) rs.selectedIds.add(candId);
+  else            rs.selectedIds.delete(candId);
+  // toggle row highlight without full re-render
+  const row = el.closest('.cand-row');
+  if (row) row.classList.toggle('cand-sel', el.checked);
+  updateCandBulkBar(k);
+  updateSelectAllCb(k);
+}
+
+function toggleSelectAllCands(k, el) {
+  const rs = getCandRowState(k);
+  const listEl = document.getElementById(`cand-list-${k}`);
+  if (!listEl) return;
+  // Only affect rows that are neither accepted nor rejected
+  const eligible = [...listEl.querySelectorAll('.cand-row:not(.cand-accepted):not(.cand-rejected)')];
+  eligible.forEach(row => {
+    const cid = row.dataset.cid;
+    if (!cid) return;
+    const cb = row.querySelector('.cand-cb');
+    if (el.checked) { rs.selectedIds.add(cid); row.classList.add('cand-sel'); if (cb) cb.checked = true; }
+    else            { rs.selectedIds.delete(cid); row.classList.remove('cand-sel'); if (cb) cb.checked = false; }
+  });
+  updateCandBulkBar(k);
+}
+
+function updateCandBulkBar(k) {
+  const rs  = getCandRowState(k);
+  const bar = document.getElementById(`cand-bulk-bar-${k}`);
+  const cnt = document.getElementById(`cand-bulk-count-${k}`);
+  if (!bar) return;
+  const n = rs.selectedIds.size;
+  bar.hidden = (n === 0);
+  if (cnt && n > 0) cnt.textContent = `${n} selected`;
+}
+
+function updateSelectAllCb(k) {
+  const rs = getCandRowState(k);
+  const sa = document.getElementById(`cand-sa-${k}`);
+  if (!sa) return;
+  const listEl = document.getElementById(`cand-list-${k}`);
+  if (!listEl) return;
+  const eligible = [...listEl.querySelectorAll('.cand-row:not(.cand-accepted):not(.cand-rejected)')]
+    .map(r => r.dataset.cid).filter(Boolean);
+  const all  = eligible.length > 0 && eligible.every(id => rs.selectedIds.has(id));
+  const some = eligible.some(id => rs.selectedIds.has(id));
+  sa.checked       = all;
+  sa.indeterminate = some && !all;
+}
+
+/* ── Bulk actions ────────────────────────────────── */
+function acceptSelected(k) {
+  const rs = getCandRowState(k);
+  rs.selectedIds.forEach(id => {
+    rs.acceptedIds.add(id);
+    rs.rejectedIds.delete(id);
+  });
+  rs.selectedIds.clear();
+  rebuildCandList(k);
+  rebuildCurrentAPLs(k);
+  syncConfirmBtn(k);
+}
+
+function rejectSelected(k) {
+  const rs = getCandRowState(k);
+  rs.selectedIds.forEach(id => {
+    rs.rejectedIds.add(id);
+    rs.acceptedIds.delete(id);
+  });
+  rs.selectedIds.clear();
+  rebuildCandList(k);
+  rebuildCurrentAPLs(k);
+  syncConfirmBtn(k);
+}
+
+function clearCandSelection(k) {
+  const rs = getCandRowState(k);
+  rs.selectedIds.clear();
+  rebuildCandList(k);
+}
+
+function rejectAllCandidates(k) {
+  const rs = getCandRowState(k);
+  ITEMS[k]?.candidates?.forEach(c => {
+    rs.rejectedIds.add(c.id);
+    rs.acceptedIds.delete(c.id);
+  });
+  rs.selectedIds.clear();
+  rebuildCandList(k);
+  rebuildCurrentAPLs(k);
+  syncConfirmBtn(k);
+}
+
+/* ── Surgical update: Current APLs column ───────── */
+function rebuildCurrentAPLs(k) {
+  const item = ITEMS[k];
+  if (!item) return;
+  const col = document.getElementById(`current-apl-col-${k}`);
+  if (!col) return;
+  col.innerHTML = buildCurrentAPLs(item);
+}
+
+/* ── Update Confirm button + panel title/sub ─────── */
+function syncConfirmBtn(k) {
+  if (k !== currentKey) return;
+  const rs    = getCandRowState(k);
+  const btn   = document.querySelector('#action-body .btn-confirm');
+  if (!btn) return;
+  const count = rs.acceptedIds.size;
+  const ready = count > 0;
+  btn.disabled = !ready;
+  const desc = btn.closest('.btn-wrap')?.querySelector('.btn-desc');
+  if (desc) desc.textContent = ready
+    ? `${count} APL${count !== 1 ? 's' : ''} will be added`
+    : 'Accept a Likely Match above to enable';
+  // Sync panel title and subtitle
+  const ab = document.getElementById('action-body');
+  if (ab) {
+    const titleEl = ab.querySelector('.p-section-title');
+    const subEl   = ab.querySelector('.p-section-sub');
+    if (titleEl) titleEl.textContent = ready
+      ? `${count} Match${count !== 1 ? 'es' : ''} Selected`
+      : 'Review Likely Matches';
+    if (subEl)   subEl.textContent   = ready
+      ? `Confirm to add ${count} APL${count !== 1 ? 's' : ''} to this ingredient.`
+      : 'Accept a Likely Match above to enable Confirm.';
+  }
+}
+
+/* Shared row builder — checkbox + hover-only actions */
+function buildCandRow(c, k, rs) {
+  const isAccepted = rs.acceptedIds.has(c.id);
+  const isRejected = rs.rejectedIds.has(c.id);
+  const isSelected = rs.selectedIds.has(c.id);
+
+  const tagsHtml = (c.tags && c.tags.length)
+    ? `<div class="cand-tags">${c.tags.map(renderCandTag).join('')}</div>` : '';
+
+  // Checkbox: checked if selected OR accepted
+  const cbChecked = (isSelected || isAccepted) ? ' checked' : '';
+  // Accepted/rejected rows use undo; neutral rows get accept/reject on hover
+  let actionsHtml;
+  if (isAccepted) {
+    actionsHtml = `
+      <div class="cand-actions">
+        <span class="cand-accepted-badge">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Accepted
+        </span>
+        <button class="cand-btn-undo" onclick="undoAcceptCandidate('${k}','${c.id}')">Undo</button>
+      </div>`;
+  } else if (isRejected) {
+    actionsHtml = `
+      <div class="cand-actions">
+        <span class="cand-rejected-badge">Rejected</span>
+        <button class="cand-btn-undo" onclick="undoRejectCandidate('${k}','${c.id}')">Undo</button>
+      </div>`;
+  } else {
+    actionsHtml = `
+      <div class="cand-actions">
+        <button class="cand-btn-accept" onclick="quickAcceptCandidate('${k}','${c.id}')">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Accept
+        </button>
+        <button class="cand-btn-reject" onclick="quickRejectCandidate('${k}','${c.id}')">Reject</button>
+      </div>`;
+  }
+
+  const rowCls = ['cand-row',
+    isAccepted ? 'cand-accepted' : '',
+    isRejected ? 'cand-rejected' : '',
+    (isSelected && !isAccepted) ? 'cand-sel' : '',
+  ].filter(Boolean).join(' ');
+
+  // Checkbox: disabled on accepted/rejected rows (state is locked via badge + undo)
+  const cbDisabled = (isAccepted || isRejected) ? ' disabled style="opacity:.4;pointer-events:none"' : '';
+  const cbOnChange = `onchange="toggleCandSelect('${k}','${c.id}',this)"`;
+
+  return `
+    <div class="${rowCls}" data-cid="${c.id}">
+      <div class="cand-cb-wrap">
+        <input type="checkbox" class="cand-cb"${cbChecked}${cbDisabled} ${cbOnChange}>
+      </div>
+      <div class="cand-main">
+        <div class="cand-brand">${c.brand}</div>
+        <div class="cand-meta">
+          <span class="cand-size">${c.size}</span>
+          <span class="cand-dot">·</span>
+          <span class="cand-price">${c.cost}</span>
+        </div>
+        ${tagsHtml}
+      </div>
+      ${actionsHtml}
+    </div>`;
+}
+
+/* ─── Candidate sort / filter state ─────────────── */
+const candState = {};
+function getCandState(k) {
+  if (!candState[k]) candState[k] = { sort: 'rec', filters: new Set() };
+  return candState[k];
+}
+
+function parseSizeGrams(s) {
+  const m = (s || '').match(/([\d.]+)\s*(kg|g|ml|l)/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const u = m[2].toLowerCase();
+  return (u === 'kg' || u === 'l') ? n * 1000 : n;
+}
+
+function sortCandList(k, val) {
+  getCandState(k).sort = val;
+  rebuildCandList(k);
+}
+
+function toggleCandFilter(k, type) {
+  const st = getCandState(k);
+  st.filters.has(type) ? st.filters.delete(type) : st.filters.add(type);
+  const chip = document.getElementById(`chip-${type}-${k}`);
+  if (chip) chip.classList.toggle('active', st.filters.has(type));
+  rebuildCandList(k);
+}
+
+function rebuildCandList(k) {
+  const item  = ITEMS[k];
+  const listEl = document.getElementById(`cand-list-${k}`);
+  if (!listEl || !item?.candidates) return;
+
+  const st   = getCandState(k);
+  let cands  = [...item.candidates];
+
+  // Filters
+  if (st.filters.has('same-pack')) {
+    const refSize = item.currentAPLs[0]?.size || '';
+    cands = cands.filter(c => c.size === refSize);
+  }
+  if (st.filters.has('lower-cost')) {
+    const refCost = parseFloat(
+      (item.currentAPLs.find(a => a.isDefault)?.cost || '₹99999')
+        .replace(/[^\d.]/g, '')
+    ) || 99999;
+    cands = cands.filter(c =>
+      parseFloat((c.cost || '₹0').replace(/[^\d.]/g, '')) < refCost
+    );
+  }
+
+  // Sort
+  if (st.sort === 'cost') {
+    cands.sort((a, b) =>
+      parseFloat((a.cost||'₹0').replace(/[^\d.]/g,'')) -
+      parseFloat((b.cost||'₹0').replace(/[^\d.]/g,''))
+    );
+  } else if (st.sort === 'pack') {
+    const ref = parseSizeGrams(item.currentAPLs[0]?.size);
+    cands.sort((a, b) =>
+      Math.abs(parseSizeGrams(a.size) - ref) - Math.abs(parseSizeGrams(b.size) - ref)
+    );
+  }
+  // 'rec' = original order
+
+  if (cands.length === 0) {
+    listEl.innerHTML = `<div class="cand-no-results">No matches for selected filters.</div>`;
+    updateCandBulkBar(k);
+    updateSelectAllCb(k);
+    return;
+  }
+
+  const rs = getCandRowState(k);
+  listEl.innerHTML = cands.map(c => buildCandRow(c, k, rs)).join('');
+
+  // Keep bulk bar and select-all checkbox in sync
+  updateCandBulkBar(k);
+  updateSelectAllCb(k);
 }
 
 function buildHistory(item) {
   const h = item.history;
   return `
     <div class="history-context">
-      <div>
-        <div class="hc-label">Previously used</div>
-        <div class="hc-value">${h.prev}</div>
-      </div>
-      <div>
-        <div class="hc-label">Last updated</div>
-        <div class="hc-value">${h.updated}</div>
-      </div>
+      <div><div class="hc-label">Previously used</div><div class="hc-value">${h.prev}</div></div>
+      <div><div class="hc-label">Last updated</div><div class="hc-value">${h.updated}</div></div>
     </div>`;
 }
 
@@ -2716,6 +3693,41 @@ function renderAction(item) {
   // Review mode (post-save)
   if (reviewMode) {
     document.getElementById('action-body').innerHTML = buildReviewActionBody(item);
+    return;
+  }
+
+  // Amber items with candidates — bulk accept/reject panel
+  if (item.candidates && item.candidates.length > 0) {
+    const rs    = getCandRowState(item.key);
+    const count = rs.acceptedIds.size;
+    const ready = count > 0;
+    const titleTxt = ready ? `${count} Match${count !== 1 ? 'es' : ''} Selected` : 'Review Likely Matches';
+    const subTxt   = ready
+      ? `Confirm to add ${count} APL${count !== 1 ? 's' : ''} to this ingredient.`
+      : 'Accept a Likely Match above to enable Confirm.';
+    const checkIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const xIcon     = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    const html = `
+      <div class="p-section-title">${titleTxt}</div>
+      <div class="p-section-sub" style="margin-bottom:20px">${subTxt}</div>
+      <div class="panel-divider"></div>
+      <div class="action-btns">
+        <div class="btn-wrap">
+          <button class="btn-confirm" onclick="triggerConfirmMapping()"${ready ? '' : ' disabled'}>
+            ${checkIcon} Confirm Mapping
+          </button>
+          <div class="btn-desc">${ready
+            ? `${count} APL${count !== 1 ? 's' : ''} will be added`
+            : 'Accept a Likely Match above to enable'}</div>
+        </div>
+        <div class="btn-wrap">
+          <button class="btn-reject" onclick="rejectAllCandidates('${item.key}')">
+            ${xIcon} Reject All
+          </button>
+          <div class="btn-desc">Reject all Likely Match candidates</div>
+        </div>
+      </div>`;
+    document.getElementById('action-body').innerHTML = html;
     return;
   }
 
@@ -2765,14 +3777,6 @@ function renderAction(item) {
       <div class="btn-desc">${a.btnDesc}</div>
     </div>`;
 
-  if (a.showModify) {
-    html += `
-      <div class="btn-wrap">
-        <button class="btn-modify" onclick="enterEditMode()">Edit</button>
-        <div class="btn-desc">Modify the suggestion before confirming</div>
-      </div>`;
-  }
-
   if (a.showReject) {
     html += `
       <div class="btn-wrap">
@@ -2812,6 +3816,7 @@ function selectItem(el) {
   reviewMode      = false;
   savedSelections = [];
   savedDefaultId  = null;
+  delete candRowState[key];   // reset per-candidate accept/reject for new item
 
   // RED items: search/assign is their default state — auto-enter edit mode
   if (ITEMS[key].queue === 'red') editMode = true;
@@ -3101,6 +4106,10 @@ function filterQueue(queue) {
   document.getElementById('search-box').value = '';
   document.querySelectorAll('.q-item').forEach(el => el.classList.remove('selected'));
 
+  // Bulk mode: enter when green tab, exit on any other tab
+  if (queue === 'green') enterBulkMode();
+  else exitBulkMode();
+
   const firstEl = applyQueueFilters();
 
   if (firstEl) {
@@ -3332,8 +4341,21 @@ function confirmMapping() {
   if (savedSelections.length > 0) {
     apls      = savedSelections.map(s => ({ ...s }));
     defaultId = savedDefaultId;
+  } else if (item.candidates && item.candidates.length > 0) {
+    // All explicitly accepted candidates; fallback to first non-rejected if none
+    const rs          = getCandRowState(item.key);
+    const acceptedArr = item.candidates.filter(c => rs.acceptedIds.has(c.id));
+    const toMap       = acceptedArr.length > 0
+      ? acceptedArr
+      : [item.candidates.find(c => !rs.rejectedIds.has(c.id)) || item.candidates[0]];
+    apls      = toMap.map(c => ({
+      id: c.id, brand: c.brand, size: c.size,
+      costNum: parseFloat((c.cost || '₹0').replace(/[^\d.]/g, '')) || 0,
+      tag: 'suggested'
+    }));
+    defaultId = apls[0].id;
   } else if (item.suggested) {
-    // Direct confirm (no edit flow) — use the AI suggestion
+    // Legacy fallback — single suggested (no candidates array)
     const cost = parseFloat((item.suggested.cost || '₹0').replace(/[^\d.]/g, '')) || 0;
     apls      = [{ id: item.suggested.id, brand: item.suggested.brand,
                    size: item.suggested.size, costNum: cost, tag: 'suggested' }];
@@ -5397,6 +6419,181 @@ function submitCreateApl(excKey) {
     renderExceptionsList();
     showToast(`APL created — ${supplier} · ${pack}${unit} · ₹${cost.toFixed(2)}`);
   }, 600);
+}
+
+/* ─────────────────────────────────────────────────
+   BULK ACTION SYSTEM — Green queue
+───────────────────────────────────────────────── */
+const bulkSelected = new Set();   // keys of selected green items
+
+function enterBulkMode() {
+  document.getElementById('q-list').classList.add('bulk-mode-active');
+  updateBulkBar();
+}
+
+function exitBulkMode() {
+  clearBulkSelection();
+  document.getElementById('q-list').classList.remove('bulk-mode-active');
+  updateBulkBar();
+}
+
+function toggleBulkItem(key, checkbox) {
+  if (confirmedItems[key]) { checkbox.checked = false; return; }
+  if (checkbox.checked) bulkSelected.add(key);
+  else bulkSelected.delete(key);
+  const el = document.querySelector(`.q-item[data-key="${key}"]`);
+  if (el) el.classList.toggle('bulk-sel', checkbox.checked);
+  updateMasterCheckbox();
+  updateBulkBar();
+}
+
+function toggleMasterSelect(masterCb) {
+  const visibleGreenItems = Array.from(
+    document.querySelectorAll('.q-item[data-queue="green"]')
+  ).filter(el => el.style.display !== 'none' && !confirmedItems[el.dataset.key]);
+
+  visibleGreenItems.forEach(el => {
+    const key = el.dataset.key;
+    const cb  = el.querySelector('.q-item-check');
+    if (masterCb.checked) {
+      bulkSelected.add(key);
+      el.classList.add('bulk-sel');
+      if (cb) cb.checked = true;
+    } else {
+      bulkSelected.delete(key);
+      el.classList.remove('bulk-sel');
+      if (cb) cb.checked = false;
+    }
+  });
+  updateBulkBar();
+}
+
+function updateMasterCheckbox() {
+  const master = document.getElementById('bulk-bar-master');
+  if (!master) return;
+  const visibleGreen = Array.from(
+    document.querySelectorAll('.q-item[data-queue="green"]')
+  ).filter(el => el.style.display !== 'none' && !confirmedItems[el.dataset.key]);
+  const total    = visibleGreen.length;
+  const selected = visibleGreen.filter(el => bulkSelected.has(el.dataset.key)).length;
+  master.checked       = selected > 0 && selected === total;
+  master.indeterminate = selected > 0 && selected < total;
+}
+
+function updateBulkBar() {
+  const bar     = document.getElementById('bulk-bar');
+  const countEl = document.getElementById('bulk-bar-count');
+  const n = bulkSelected.size;
+  bar.classList.toggle('visible', n > 0);
+  if (countEl) countEl.textContent = n;
+  updateMasterCheckbox();
+}
+
+function clearBulkSelection() {
+  bulkSelected.clear();
+  document.querySelectorAll('.q-item.bulk-sel').forEach(el => el.classList.remove('bulk-sel'));
+  document.querySelectorAll('.q-item-check').forEach(cb => cb.checked = false);
+  const master = document.getElementById('bulk-bar-master');
+  if (master) { master.checked = false; master.indeterminate = false; }
+  updateBulkBar();
+}
+
+function reviewNextSelected() {
+  const [firstKey] = bulkSelected;
+  if (!firstKey) return;
+  const el = document.querySelector(`.q-item[data-key="${firstKey}"]`);
+  if (el) selectItem(el);
+}
+
+/* Quick "Confirm All (N)" from the green header bar */
+function quickConfirmAllGreen() {
+  // Select all unconfirmed green items then open modal
+  const visibleGreen = Array.from(
+    document.querySelectorAll('.q-item[data-queue="green"]')
+  ).filter(el => el.style.display !== 'none' && !confirmedItems[el.dataset.key]);
+
+  bulkSelected.clear();
+  visibleGreen.forEach(el => {
+    bulkSelected.add(el.dataset.key);
+    el.classList.add('bulk-sel');
+    const cb = el.querySelector('.q-item-check');
+    if (cb) cb.checked = true;
+  });
+  updateMasterCheckbox();
+  updateBulkBar();
+  openBulkModal();
+}
+
+/* Open confirmation modal */
+function openBulkModal() {
+  if (bulkSelected.size === 0) return;
+  const n = bulkSelected.size;
+  document.getElementById('modal-item-count').textContent =
+    `${n} item${n !== 1 ? 's' : ''}`;
+  const listEl = document.getElementById('modal-item-list');
+  listEl.innerHTML = Array.from(bulkSelected).map(key => {
+    const item = ITEMS[key];
+    return `<div class="bulk-modal-item">${item?.name || key} <span style="color:#94A3B8;font-size:10.5px">· ${item?.site || ''}</span></div>`;
+  }).join('');
+  document.getElementById('bulk-modal-overlay').classList.add('visible');
+}
+
+function closeBulkModal(e) {
+  if (e && e.target !== document.getElementById('bulk-modal-overlay')) return;
+  document.getElementById('bulk-modal-overlay').classList.remove('visible');
+}
+
+/* Execute bulk confirmation */
+function executeBulkConfirm() {
+  const keys = Array.from(bulkSelected);
+  const n    = keys.length;
+
+  keys.forEach(key => {
+    const item = ITEMS[key];
+    if (!item) return;
+
+    // Confirm using existing APLs / defaults
+    const apls = item.currentAPLs.map(a => ({
+      id: a.id, brand: a.brand, size: a.size, tag: null,
+      costNum: parseFloat((a.cost || '₹0').replace(/[^\d.]/g, '')) || 0
+    }));
+    const defaultId = item.currentAPLs.find(a => a.isDefault)?.id || item.currentAPLs[0]?.id || null;
+    confirmedItems[key] = { apls, defaultId };
+    item.statusTag = 'Mapped';
+    pushItemHistory(key, { iconType:'check', label:'Bulk mapping confirmed', detail:'Confirmed via bulk action' });
+
+    // Add mapped badge to row
+    const qRow = document.querySelector(`.q-item[data-key="${key}"]`);
+    if (qRow) {
+      const nameEl = qRow.querySelector('.q-name');
+      if (nameEl && !nameEl.querySelector('.badge-mapped')) {
+        const badge = document.createElement('span');
+        badge.className = 'badge-mapped';
+        badge.innerHTML = `<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Mapped`;
+        nameEl.appendChild(badge);
+      }
+      // Disable checkbox on confirmed item
+      const cb = qRow.querySelector('.q-item-check');
+      if (cb) { cb.checked = false; cb.disabled = true; cb.style.opacity = '.3'; }
+      qRow.classList.remove('bulk-sel');
+    }
+  });
+
+  // Close modal, clear selection, refresh detail if needed
+  document.getElementById('bulk-modal-overlay').classList.remove('visible');
+  bulkSelected.clear();
+  document.querySelectorAll('.q-item-check').forEach(cb => { if (!cb.disabled) cb.checked = false; });
+  const master = document.getElementById('bulk-bar-master');
+  if (master) { master.checked = false; master.indeterminate = false; }
+  updateBulkBar();
+
+  // Refresh detail panel if current item was in the bulk
+  if (currentKey && confirmedItems[currentKey]) {
+    renderDetail(ITEMS[currentKey]);
+    renderAction(ITEMS[currentKey]);
+  }
+
+  showToast(`✓ ${n} mapping${n !== 1 ? 's' : ''} confirmed`);
 }
 
 /* ─────────────────────────────────────────────────
